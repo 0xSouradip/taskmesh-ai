@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Sparkles, Layers, ShieldCheck, Cpu, Code2, Globe } from 'lucide-react';
+import { Sparkles, Layers, ShieldCheck, Cpu, Code2, Globe, GraduationCap } from 'lucide-react';
 
 export default function Footer() {
   const { setActiveTab } = useApp();
@@ -26,16 +26,11 @@ export default function Footer() {
               We reject the 6-week monolithic freelance gamble. By breaking projects into atomic tasks, specialists ship what they excel at, finished deliverables become verifiable proof of skill, and AI coordinates dependencies in the background.
             </p>
 
-            <div className="pt-2 text-xs text-slate-500 font-mono">
-              Designed & Built by{' '}
-              <a
-                href="https://github.com/0xSouradip"
-                target="_blank"
-                rel="noreferrer"
-                className="text-indigo-400 hover:underline font-semibold"
-              >
-                @0xSouradip (Souradip Ghosh)
-              </a>
+            <div className="pt-2 text-xs text-slate-400 font-mono space-y-1">
+              <div className="text-white font-semibold">Founding Engineering Team:</div>
+              <div>• <strong className="text-indigo-400">Souradip Ghosh</strong> — Lead Engineer & System Architect</div>
+              <div>• <strong className="text-emerald-400">Angshu Sarkar</strong> — Frontend Engineer</div>
+              <div>• <strong className="text-purple-400">Sneha Mukherjee</strong> — Frontend Engineer</div>
             </div>
           </div>
 
@@ -43,6 +38,15 @@ export default function Footer() {
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">Platform</h4>
             <ul className="space-y-2 text-xs">
+              <li>
+                <button
+                  onClick={() => setActiveTab('team')}
+                  className="hover:text-white transition-colors flex items-center gap-1.5 text-indigo-400 font-semibold"
+                >
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  <span>Meet Founding Team</span>
+                </button>
+              </li>
               <li>
                 <button
                   onClick={() => setActiveTab('explore')}
@@ -124,7 +128,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} TaskMesh. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} TaskMesh. Founded by Souradip Ghosh, Angshu Sarkar & Sneha Mukherjee.</p>
           <p className="font-mono">React 19 • Tailwind CSS • Vite • Autonomous Swarm</p>
         </div>
 

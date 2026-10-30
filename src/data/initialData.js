@@ -1,3 +1,49 @@
+import souradipImg from '../assets/team/souradip.jpg';
+import angshuImg from '../assets/team/angshu.jpg';
+import snehaImg from '../assets/team/sneha.jpg';
+
+export const coreTeam = [
+  {
+    id: 'team-1',
+    name: 'Souradip Ghosh',
+    role: 'Lead Engineer & AI Architect',
+    tagline: 'Student & Tech Enthusiast',
+    bio: '19-year-old student with a Pure Science background and a passionate drive for modern programming and decentralized systems. Architects the TaskMesh DAG dependency engine, AI autonomous test harnesses, and end-to-end full stack infrastructure.',
+    image: souradipImg,
+    handle: '0xSouradip',
+    github: 'https://github.com/0xSouradip',
+    skills: ['AI Orchestration', 'Full-Stack Architecture', 'React 19 & Vite', 'DAG Dependency Engines', 'Autonomous Agents'],
+    badge: 'Founding Lead',
+    contributionsCount: 12
+  },
+  {
+    id: 'team-2',
+    name: 'Angshu Sarkar',
+    role: 'Frontend Engineer',
+    tagline: 'Computer Science Student',
+    bio: 'Dedicated student developer focused on cutting-edge frontend engineering, atomic UI component systems, Tailwind CSS styling, and reactive state workflows. Crafts hyper-responsive interfaces that make modular building feel like a team game.',
+    image: angshuImg,
+    handle: 'angshu_dev',
+    github: 'https://github.com/0xSouradip',
+    skills: ['React & Tailwind CSS', 'Interactive Components', 'UI Performance', 'Responsive Systems', 'State Architecture'],
+    badge: 'Core Builder',
+    contributionsCount: 9
+  },
+  {
+    id: 'team-3',
+    name: 'Sneha Mukherjee',
+    role: 'Frontend Engineer',
+    tagline: 'Engineering Student & UI Builder',
+    bio: 'Energetic tech student passionate about modern JavaScript, accessible design principles, motion graphics, and gamified web experiences. Specializes in transforming micro-task requirements into polished, intuitive user journeys.',
+    image: snehaImg,
+    handle: 'sneha_tech',
+    github: 'https://github.com/0xSouradip',
+    skills: ['Modern Frontend UI', 'Accessibility (WCAG)', 'Animation & Canvas', 'Micro-Task Workflows', 'Design Token Sync'],
+    badge: 'Core Builder',
+    contributionsCount: 8
+  }
+];
+
 export const initialProjects = [
   {
     id: 'proj-1',
@@ -5,9 +51,9 @@ export const initialProjects = [
     category: 'Fintech & Web3',
     description: 'A lightweight embeddable crypto checkout modal supporting Solana, Base, and Stripe fiat onramps for digital creators.',
     totalBudget: 1450,
-    paidBudget: 420,
+    paidBudget: 680,
     tasksCount: 6,
-    completedTasksCount: 2,
+    completedTasksCount: 3,
     leadAI: 'Autonomous Pipeline Engine v3.4',
     status: 'ACTIVE',
     createdAt: '2 days ago'
@@ -18,9 +64,9 @@ export const initialProjects = [
     category: 'AI & Productivity',
     description: 'Transform rambling 5-minute audio voice notes into clean Jira/Linear tickets with acceptance criteria, priority tags, and assignees.',
     totalBudget: 2200,
-    paidBudget: 1150,
+    paidBudget: 1330,
     tasksCount: 8,
-    completedTasksCount: 4,
+    completedTasksCount: 5,
     leadAI: 'SpecDecomposer Agent 2.1',
     status: 'ACTIVE',
     createdAt: '4 days ago'
@@ -116,8 +162,8 @@ export const initialTasks = [
     estimatedHours: '3 - 4 hrs',
     bounty: 260,
     xp: 650,
-    status: 'AVAILABLE',
-    claimedBy: null,
+    status: 'COMPLETED',
+    claimedBy: 'angshu_dev',
     prerequisites: ['task-101', 'task-102'],
     description: 'Implement the finalized Figma modal in React using Tailwind CSS. Must consume the microcopy strings from task-102 and match the token spec.',
     deliverables: [
@@ -130,7 +176,14 @@ export const initialTasks = [
       'Aria-modal and aria-labelledby correctly configured for accessibility',
       'Matches Figma token specifications within 1px fidelity'
     ],
-    submission: null
+    submission: {
+      submittedAt: 'Today at 14:20',
+      author: 'Angshu Sarkar (@angshu_dev)',
+      link: 'https://github.com/0xSouradip/aetherpay-modal-react',
+      notes: 'Implemented with React 19 and Tailwind CSS. Implemented focus trap, smooth CSS backdrop blur, and full WCAG keyboard navigation.',
+      aiReviewScore: 99,
+      aiFeedback: 'Verified: 100% fidelity with Figma token scale. Accessibility automated audit passed with zero violations. Sub-5kb bundle impact.'
+    }
   },
   {
     id: 'task-104',
@@ -193,9 +246,9 @@ export const initialTasks = [
     estimatedHours: '2 - 3 hrs',
     bounty: 210,
     xp: 500,
-    status: 'BLOCKED',
+    status: 'AVAILABLE',
     claimedBy: null,
-    prerequisites: ['task-103', 'task-104'],
+    prerequisites: ['task-103'],
     description: 'Write end-to-end integration tests testing happy path, wallet rejection, network timeout, and invalid amount inputs.',
     deliverables: [
       'Playwright test suite with mocked wallet provider',
@@ -304,8 +357,8 @@ export const initialTasks = [
     estimatedHours: '2 hrs',
     bounty: 180,
     xp: 450,
-    status: 'AVAILABLE',
-    claimedBy: null,
+    status: 'COMPLETED',
+    claimedBy: 'sneha_tech',
     prerequisites: [],
     description: 'Create an animated, reactive canvas-based waveform that dances in real time while user is speaking voice notes.',
     deliverables: [
@@ -316,7 +369,14 @@ export const initialTasks = [
       'Clean fallback when microphone permissions are denied',
       'GPU accelerated with zero main-thread lag'
     ],
-    submission: null
+    submission: {
+      submittedAt: 'Yesterday at 16:45',
+      author: 'Sneha Mukherjee (@sneha_tech)',
+      link: 'https://github.com/0xSouradip/reactive-audio-wave',
+      notes: 'Built using HTML5 Canvas 2D context with double-buffering. Added silky neon gradient trail and dynamic frequency height responding to decibel level.',
+      aiReviewScore: 98,
+      aiFeedback: 'Verified: Constant 60 FPS verified on low-power mobile simulation. Zero CPU spikes during 10-minute continuous recording simulation.'
+    }
   },
   {
     id: 'task-301',
@@ -373,26 +433,77 @@ export const sampleFreelancers = [
     id: 'user-0',
     name: 'Souradip Ghosh',
     handle: '0xSouradip',
-    avatar: 'https://avatars.githubusercontent.com/u/275792224?v=4',
-    title: 'AI Systems Architect & Full-Stack Engineer',
-    bio: 'Passionate builder specializing in decentralized systems, AI automation pipelines, and modular UI engineering.',
-    xp: 1850,
-    level: 7,
-    bountiesEarned: 890,
-    tasksCompleted: 4,
+    avatar: souradipImg,
+    title: 'Lead Engineer & AI Architect',
+    bio: '19-year-old student with a Pure Science background and an intense passion for technology, systems programming, and autonomous AI architectures.',
+    xp: 3850,
+    level: 13,
+    bountiesEarned: 1890,
+    tasksCompleted: 8,
     acceptanceRate: 100,
-    speedRating: 'Top 5% (1.8x avg)',
+    speedRating: 'Top 3% (1.9x avg)',
+    isFoundingTeam: true,
     skills: [
-      { name: 'AI & Prompts', level: 92 },
-      { name: 'Frontend (React)', level: 88 },
-      { name: 'Backend & APIs', level: 84 },
-      { name: 'Web3 & Crypto', level: 78 },
-      { name: 'QA & Testing', level: 86 }
+      { name: 'AI Architecture & DAGs', level: 98 },
+      { name: 'Full-Stack Systems', level: 94 },
+      { name: 'React 19 & Modern Web', level: 92 },
+      { name: 'APIs & Micro-Escrow', level: 90 },
+      { name: 'QA & Test Harnesses', level: 95 }
     ],
     badges: [
-      { id: 'b-1', name: 'Zero-Flaw Execution', description: '100% first-pass AI acceptance rate on 4 consecutive tasks', icon: 'ShieldCheck' },
-      { id: 'b-2', name: 'Prompt Maestro', description: 'Engineered zero-schema-failure prompt pipelines', icon: 'Sparkles' },
-      { id: 'b-3', name: 'Speed Demon', description: 'Completed tasks in under 50% of allocated window', icon: 'Zap' }
+      { id: 'b-1', name: 'Lead Architect', description: 'Engineered the TaskMesh autonomous DAG dependency engine', icon: 'Cpu' },
+      { id: 'b-2', name: 'Zero-Flaw Execution', description: '100% first-pass AI acceptance rate across 8 consecutive tasks', icon: 'ShieldCheck' },
+      { id: 'b-3', name: 'Speed Demon', description: 'Completed tasks in under 45% of allocated time window', icon: 'Zap' }
+    ]
+  },
+  {
+    id: 'user-angshu',
+    name: 'Angshu Sarkar',
+    handle: 'angshu_dev',
+    avatar: angshuImg,
+    title: 'Frontend Engineer',
+    bio: 'Computer science student and creative frontend engineer. Passionate about sleek modern user interfaces, reactive state management, Tailwind CSS, and seamless micro-task workflows.',
+    xp: 2950,
+    level: 10,
+    bountiesEarned: 1450,
+    tasksCompleted: 6,
+    acceptanceRate: 99,
+    speedRating: 'Top 7%',
+    isFoundingTeam: true,
+    skills: [
+      { name: 'React & Component Architecture', level: 96 },
+      { name: 'Tailwind CSS & Design Tokens', level: 97 },
+      { name: 'Responsive Web Engineering', level: 93 },
+      { name: 'Micro-Interactions', level: 89 }
+    ],
+    badges: [
+      { id: 'b-angshu-1', name: 'Pixel Perfectionist', description: 'Shipped modular React modal with 99/100 design token fidelity', icon: 'Eye' },
+      { id: 'b-angshu-2', name: 'Rapid Prototyper', description: 'Built and verified 6 high-density UI components in record time', icon: 'Zap' }
+    ]
+  },
+  {
+    id: 'user-sneha',
+    name: 'Sneha Mukherjee',
+    handle: 'sneha_tech',
+    avatar: snehaImg,
+    title: 'Frontend Engineer',
+    bio: 'Engineering student with deep focus on modern web frontend engineering, accessible design systems, interactive HTML5 canvas components, and gamified UI experiences.',
+    xp: 2780,
+    level: 9,
+    bountiesEarned: 1380,
+    tasksCompleted: 5,
+    acceptanceRate: 98,
+    speedRating: 'Top 9%',
+    isFoundingTeam: true,
+    skills: [
+      { name: 'Modern React & JavaScript', level: 94 },
+      { name: 'Canvas & Waveform Audio', level: 95 },
+      { name: 'Web Accessibility (WCAG)', level: 92 },
+      { name: 'UI Micro-Interactions', level: 90 }
+    ],
+    badges: [
+      { id: 'b-sneha-1', name: 'Audio Wavefront', description: 'Engineered 60 FPS real-time audio canvas visualizer', icon: 'Sparkles' },
+      { id: 'b-sneha-2', name: 'Accessibility Champion', description: '100% WCAG AA compliance on all delivered user interfaces', icon: 'ShieldCheck' }
     ]
   },
   {
@@ -400,23 +511,22 @@ export const sampleFreelancers = [
     name: 'Elena Rostova',
     handle: 'elena_ux',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    title: 'Design Systems & Product Designer',
-    bio: 'Ex-Figma community creator. Obsessed with auto-layout, atomic design tokens, and WCAG AAA accessibility.',
-    xp: 3420,
-    level: 12,
-    bountiesEarned: 1680,
-    tasksCompleted: 9,
+    title: 'Design Systems Specialist',
+    bio: 'Ex-Figma community contributor. Obsessed with auto-layout, atomic design tokens, and WCAG AAA accessibility.',
+    xp: 2420,
+    level: 8,
+    bountiesEarned: 1180,
+    tasksCompleted: 5,
     acceptanceRate: 98,
     speedRating: 'Top 10%',
+    isFoundingTeam: false,
     skills: [
       { name: 'UI/UX Design', level: 98 },
       { name: 'Design Tokens', level: 95 },
-      { name: 'Prototyping', level: 90 },
-      { name: 'Micro-interactions', level: 85 }
+      { name: 'Prototyping', level: 90 }
     ],
     badges: [
-      { id: 'b-4', name: 'Pixel Perfectionist', description: 'Achieved 98+ score on 5 consecutive design reviews', icon: 'Eye' },
-      { id: 'b-5', name: 'Token Master', description: 'Exported machine-readable tokens for 8 swarms', icon: 'Cpu' }
+      { id: 'b-4', name: 'Token Master', description: 'Exported machine-readable tokens for 8 swarms', icon: 'Cpu' }
     ]
   },
   {
@@ -426,19 +536,19 @@ export const sampleFreelancers = [
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     title: 'Rust & Smart Contract Specialist',
     bio: 'Writing provably secure distributed code and cryptographic hooks. Zero memory leaks guaranteed.',
-    xp: 2900,
-    level: 10,
-    bountiesEarned: 1420,
-    tasksCompleted: 6,
+    xp: 2200,
+    level: 7,
+    bountiesEarned: 1120,
+    tasksCompleted: 4,
     acceptanceRate: 97,
     speedRating: 'Top 15%',
+    isFoundingTeam: false,
     skills: [
       { name: 'Rust & Solana', level: 94 },
-      { name: 'Cryptography', level: 90 },
-      { name: 'Performance Optimization', level: 93 }
+      { name: 'Cryptography', level: 90 }
     ],
     badges: [
-      { id: 'b-6', name: 'Iron Clad', description: 'Zero security vulnerabilities found across 6 smart contracts', icon: 'Lock' }
+      { id: 'b-6', name: 'Iron Clad', description: 'Zero security vulnerabilities found across 4 smart contracts', icon: 'Lock' }
     ]
   },
   {
@@ -448,16 +558,16 @@ export const sampleFreelancers = [
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
     title: 'Conversion & Technical Copywriter',
     bio: 'Making complicated technical concepts feel intuitive and crystal clear. Less jargon, more conversions.',
-    xp: 2150,
-    level: 8,
-    bountiesEarned: 960,
-    tasksCompleted: 7,
+    xp: 1950,
+    level: 6,
+    bountiesEarned: 860,
+    tasksCompleted: 4,
     acceptanceRate: 99,
     speedRating: 'Top 8%',
+    isFoundingTeam: false,
     skills: [
       { name: 'UX Microcopy', level: 96 },
-      { name: 'Technical Docs', level: 91 },
-      { name: 'Brand Voice', level: 89 }
+      { name: 'Technical Docs', level: 91 }
     ],
     badges: [
       { id: 'b-7', name: 'Clarity Champion', description: 'Grade 6 readability on technical error flows', icon: 'Feather' }
@@ -468,41 +578,41 @@ export const sampleFreelancers = [
 export const initialAIEvents = [
   {
     id: 'ev-1',
-    timestamp: '2 mins ago',
+    timestamp: 'Just now',
     type: 'TASK_VERIFIED',
-    message: 'AI Verifier: Task #102 verified for @liam_writes with 96/100 score.',
+    message: 'AI Verifier: Task #103 verified for @angshu_dev with 99/100 score. Escrow released.',
     badge: 'Verification',
     badgeColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
   },
   {
     id: 'ev-2',
-    timestamp: '5 mins ago',
+    timestamp: '4 mins ago',
+    type: 'TASK_VERIFIED',
+    message: 'AI Verifier: Task #204 (Audio Waveform) verified for @sneha_tech with 98/100 score.',
+    badge: 'Verification',
+    badgeColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+  },
+  {
+    id: 'ev-3',
+    timestamp: '15 mins ago',
     type: 'PREREQUISITE_UNLOCKED',
-    message: 'Autonomous Dependency Engine: Unlocked Task #103 (React Modal) for the frontend swarm!',
+    message: 'Autonomous Dependency Engine: Unlocked Task #106 for the QA swarm following @angshu_dev deliverable.',
     badge: 'Graph Unlocked',
     badgeColor: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20'
   },
   {
-    id: 'ev-3',
-    timestamp: '12 mins ago',
+    id: 'ev-4',
+    timestamp: '32 mins ago',
     type: 'BOUNTY_PAID',
-    message: 'Micro-Escrow: $120 USDC + 300 XP automatically transferred to @liam_writes.',
+    message: 'Micro-Escrow: $260 USDC + 650 XP automatically transferred to @angshu_dev.',
     badge: 'Instant Escrow',
     badgeColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-  },
-  {
-    id: 'ev-4',
-    timestamp: '28 mins ago',
-    type: 'SWARM_MATCH',
-    message: 'Skill Matcher: Matched 4 high-affinity contributors for Solana Adapter (Task #104).',
-    badge: 'Auto-Routing',
-    badgeColor: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20'
   },
   {
     id: 'ev-5',
     timestamp: '1 hour ago',
     type: 'PROJECT_DECOMPOSED',
-    message: 'Project Architect: Successfully decomposed "PulseCraft" into 8 modular micro-tasks with DAG constraints.',
+    message: 'Lead Architect @0xSouradip successfully decomposed "PulseCraft" into 8 modular micro-tasks with DAG constraints.',
     badge: 'Decomposition',
     badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20'
   }

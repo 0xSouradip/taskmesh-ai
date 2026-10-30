@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import ComparisonSection from './components/ComparisonSection';
+import TeamSection from './components/TeamSection';
 import QuestBoard from './components/QuestBoard';
 import AIDecomposer from './components/AIDecomposer';
 import SwarmEngine from './components/SwarmEngine';
@@ -21,9 +22,12 @@ function MainContent() {
         <>
           <Hero />
           <ComparisonSection />
+          <TeamSection />
           <QuestBoard />
         </>
       )}
+
+      {activeTab === 'team' && <TeamSection />}
 
       {activeTab === 'decomposer' && <AIDecomposer />}
 

@@ -13,7 +13,8 @@ import {
   RotateCcw,
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  GraduationCap
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -31,6 +32,7 @@ export default function Navbar() {
 
   const navItems = [
     { id: 'explore', label: 'Quest Board', icon: Layers },
+    { id: 'team', label: 'Founding Team', icon: GraduationCap },
     { id: 'decomposer', label: 'AI Decomposer', icon: Sparkles, highlight: true },
     { id: 'swarm', label: 'Swarm Engine', icon: Cpu },
     { id: 'portfolio', label: 'Proof of Skill', icon: ShieldCheck },

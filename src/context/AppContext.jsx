@@ -18,12 +18,34 @@ export function AppProvider({ children }) {
 
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('taskmesh_user');
-    return saved ? JSON.parse(saved) : sampleFreelancers[0];
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.handle === '0xSouradip') {
+          return {
+            ...parsed,
+            avatar: sampleFreelancers[0].avatar,
+            title: 'Lead Engineer & AI Architect',
+            name: 'Souradip Ghosh',
+            isFoundingTeam: true
+          };
+        }
+        return parsed;
+      } catch {}
+    }
+    return sampleFreelancers[0];
   });
 
   const [freelancers, setFreelancers] = useState(() => {
     const saved = localStorage.getItem('taskmesh_freelancers');
-    return saved ? JSON.parse(saved) : sampleFreelancers;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasAngshu = parsed.some(f => f.handle === 'angshu_dev');
+        if (hasAngshu) return parsed;
+      } catch {}
+    }
+    return sampleFreelancers;
   });
 
   const [aiEvents, setAiEvents] = useState(() => {

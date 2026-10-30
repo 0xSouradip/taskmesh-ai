@@ -14,21 +14,25 @@ import {
   Lock,
   Code2,
   FileCheck,
-  Star
+  Star,
+  Users
 } from 'lucide-react';
 
 export default function ProofOfSkill() {
-  const { currentUser, tasks } = useApp();
+  const { freelancers, tasks } = useApp();
+  const [selectedHandle, setSelectedHandle] = useState('0xSouradip');
   const [copied, setCopied] = useState(false);
 
-  // Find all tasks completed by current user or completed in general
+  const activeSpecialist = freelancers.find(f => f.handle === selectedHandle) || freelancers[0];
+
+  // Find all tasks completed by this specialist
   const completedTasks = tasks.filter(
-    (t) => t.status === 'COMPLETED' && (t.claimedBy === currentUser.handle || t.claimedBy === '0xSouradip')
+    (t) => t.status === 'COMPLETED' && (t.claimedBy === activeSpecialist.handle || (activeSpecialist.handle === '0xSouradip' && t.claimedBy === '0xSouradip'))
   );
 
   const handleShare = () => {
     navigator.clipboard.writeText(
-      `https://taskmesh.ai/proof/${currentUser.handle}`
+      `https://taskmesh.ai/proof/${activeSpecialist.handle}`
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -38,7 +42,7 @@ export default function ProofOfSkill() {
     <div className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="text-xs font-mono uppercase tracking-wider text-emerald-400">
@@ -52,7 +56,7 @@ export default function ProofOfSkill() {
             Proof of Skill Ledger
           </h2>
           <p className="text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            Resumes lie. Finished micro-tasks don't. Here is the cryptographic and executable evidence of what you have built, tested, and shipped.
+            Resumes lie. Finished micro-tasks don't. Inspect the cryptographic and executable evidence of what each builder has actually built, tested, and shipped.
           </p>
         </div>
 
@@ -61,8 +65,42 @@ export default function ProofOfSkill() {
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/25 transition-all self-start md:self-auto"
         >
           {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-          <span>{copied ? 'Proof Link Copied!' : 'Share Proof-of-Work Link'}</span>
+          <span>{copied ? 'Proof Link Copied!' : `Share @${activeSpecialist.handle}'s Proof`}</span>
         </button>
+      </div>
+
+      {/* Engineer Switcher Bar */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6 no-scrollbar">
+        <span className="text-xs font-mono text-slate-400 mr-1 flex items-center gap-1">
+          <Users className="w-3.5 h-3.5" />
+          Inspect Builder:
+        </span>
+        {freelancers.map((f) => {
+          const isSelected = f.handle === activeSpecialist.handle;
+          return (
+            <button
+              key={f.id}
+              onClick={() => setSelectedHandle(f.handle)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                isSelected
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20 ring-1 ring-indigo-400'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700'
+              }`}
+            >
+              <img
+                src={f.avatar}
+                alt={f.name}
+                className="w-5 h-5 rounded-md object-cover ring-1 ring-slate-700"
+              />
+              <span>{f.name}</span>
+              {f.isFoundingTeam && (
+                <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  Team
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Profile Overview Card */}
@@ -72,29 +110,34 @@ export default function ProofOfSkill() {
           <div className="flex items-center gap-4">
             <div className="relative">
               <img
-                src={currentUser.avatar}
-                alt={currentUser.name}
+                src={activeSpecialist.avatar}
+                alt={activeSpecialist.name}
                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-2 ring-indigo-500/40 shadow-lg"
               />
               <span className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-lg bg-indigo-600 text-white text-xs font-extrabold shadow-md">
-                Lvl {currentUser.level}
+                Lvl {activeSpecialist.level}
               </span>
             </div>
 
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-xl sm:text-2xl font-bold text-white">
-                  {currentUser.name}
+                  {activeSpecialist.name}
                 </h3>
                 <span className="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                  @{currentUser.handle}
+                  @{activeSpecialist.handle}
                 </span>
+                {activeSpecialist.isFoundingTeam && (
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Founding Team
+                  </span>
+                )}
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                {currentUser.title}
+              <p className="text-xs sm:text-sm font-semibold text-indigo-300 mt-1">
+                {activeSpecialist.title}
               </p>
-              <p className="text-xs text-slate-500 mt-1 max-w-md">
-                {currentUser.bio}
+              <p className="text-xs text-slate-400 mt-1 max-w-xl leading-relaxed">
+                {activeSpecialist.bio}
               </p>
             </div>
           </div>
@@ -105,7 +148,7 @@ export default function ProofOfSkill() {
               <div className="text-xs text-slate-400">Total Bounties</div>
               <div className="text-lg font-bold text-emerald-400 mt-0.5 flex items-center justify-center">
                 <Coins className="w-4 h-4 mr-1 text-emerald-400" />
-                ${currentUser.bountiesEarned}
+                ${activeSpecialist.bountiesEarned}
               </div>
             </div>
 
@@ -113,14 +156,14 @@ export default function ProofOfSkill() {
               <div className="text-xs text-slate-400">Earned XP</div>
               <div className="text-lg font-bold text-amber-400 mt-0.5 flex items-center justify-center">
                 <Flame className="w-4 h-4 mr-1 text-amber-400" />
-                {currentUser.xp}
+                {activeSpecialist.xp}
               </div>
             </div>
 
             <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 col-span-2 sm:col-span-1">
               <div className="text-xs text-slate-400">AI Acceptance</div>
               <div className="text-lg font-bold text-indigo-300 mt-0.5">
-                {currentUser.acceptanceRate || 100}%
+                {activeSpecialist.acceptanceRate || 100}%
               </div>
             </div>
           </div>
@@ -142,7 +185,7 @@ export default function ProofOfSkill() {
           </div>
 
           <div className="space-y-4">
-            {(currentUser.skills || []).map((skill, idx) => (
+            {(activeSpecialist.skills || []).map((skill, idx) => (
               <div key={idx} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-slate-200">{skill.name}</span>
@@ -166,11 +209,13 @@ export default function ProofOfSkill() {
               <Award className="w-5 h-5 text-amber-400" />
               Proof-of-Work Badges
             </h4>
-            <span className="text-xs font-mono text-amber-400">3 Unlocked</span>
+            <span className="text-xs font-mono text-amber-400">
+              {(activeSpecialist.badges || []).length} Unlocked
+            </span>
           </div>
 
           <div className="space-y-3">
-            {(currentUser.badges || []).map((badge) => (
+            {(activeSpecialist.badges || []).map((badge) => (
               <div
                 key={badge.id}
                 className="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 flex items-start gap-3"
@@ -197,20 +242,20 @@ export default function ProofOfSkill() {
           <div>
             <h4 className="text-lg font-bold text-white flex items-center gap-2">
               <FileCheck className="w-5 h-5 text-emerald-400" />
-              Verified Micro-Task Ledger
+              Verified Micro-Task Ledger for {activeSpecialist.name}
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
               Every card represents a completed, paid, and AI-inspected unit of work.
             </p>
           </div>
           <span className="text-xs font-mono px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            {completedTasks.length} Verified Entries
+            {completedTasks.length} Verified Tasks
           </span>
         </div>
 
         {completedTasks.length === 0 ? (
           <div className="py-12 text-center text-slate-500">
-            <p className="text-sm">No tasks completed yet.</p>
+            <p className="text-sm">No tasks completed by @{activeSpecialist.handle} yet.</p>
             <p className="text-xs mt-1">Claim and complete quests on the Quest Board to generate verifiable proof of skill!</p>
           </div>
         ) : (
