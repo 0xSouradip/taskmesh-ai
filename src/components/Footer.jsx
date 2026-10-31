@@ -28,7 +28,7 @@ export default function Footer() {
 
             <div className="pt-2 text-xs text-slate-400 font-mono space-y-1">
               <div className="text-white font-semibold">Founding Engineering Team:</div>
-              <div>• <strong className="text-indigo-400">Souradip Ghosh</strong> — Lead Engineer & System Architect</div>
+              <div>• <strong className="text-indigo-400">Souradip Ghosh</strong> — Lead Engineer & System Architect (<a href="mailto:ghoshsouradip@gmail.com" className="text-indigo-300 hover:underline">ghoshsouradip@gmail.com</a>)</div>
               <div>• <strong className="text-emerald-400">Angshu Sarkar</strong> — Frontend Engineer</div>
               <div>• <strong className="text-purple-400">Sneha Mukherjee</strong> — Frontend Engineer</div>
             </div>

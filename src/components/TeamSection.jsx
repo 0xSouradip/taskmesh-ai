@@ -9,7 +9,8 @@ import {
   CheckCircle2,
   Cpu,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Mail
 } from 'lucide-react';
 
 export default function TeamSection() {
@@ -97,6 +98,18 @@ export default function TeamSection() {
                     <div className="text-xs text-slate-400 font-mono mt-0.5">
                       @{member.handle} • {member.tagline}
                     </div>
+
+                    {/* Email Contact Pill */}
+                    {member.email && (
+                      <a
+                        href={`mailto:${member.email}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 hover:text-white border border-indigo-500/30 text-xs font-mono transition-all mt-2.5 shadow-sm shadow-indigo-500/10"
+                        title={`Email ${member.name} directly`}
+                      >
+                        <Mail className="w-3.5 h-3.5 text-indigo-400" />
+                        <span>{member.email}</span>
+                      </a>
+                    )}
                   </div>
 
                   {/* Bio */}
@@ -144,8 +157,8 @@ export default function TeamSection() {
         </div>
 
         {/* Student Engineering Credo Banner */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-slate-900 to-purple-950/40 border border-indigo-500/30 text-center max-w-4xl mx-auto shadow-2xl">
-          <div className="flex items-center justify-center gap-2 mb-2">
+        <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-slate-900 to-purple-950/40 border border-indigo-500/30 text-center max-w-4xl mx-auto shadow-2xl space-y-4">
+          <div className="flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-400" />
             <h4 className="text-base font-bold text-white">
               The Student Engineering Creed
@@ -154,12 +167,22 @@ export default function TeamSection() {
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
             "We believe students and emerging developers shouldn't be judged by years of resume fluff or asked to do unpaid test projects. With TaskMesh, every 2-hour task you complete is an immutable, verifiable proof of what you can actually build."
           </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-indigo-300">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-indigo-300">
             <span>Souradip Ghosh (Lead)</span>
             <span>•</span>
             <span>Angshu Sarkar (Frontend)</span>
             <span>•</span>
             <span>Sneha Mukherjee (Frontend)</span>
+          </div>
+          <div className="pt-2 border-t border-slate-800/60 flex items-center justify-center gap-2 text-xs font-mono text-slate-400">
+            <span>Reach out to the lead engineer:</span>
+            <a
+              href="mailto:ghoshsouradip@gmail.com"
+              className="text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1 font-semibold"
+            >
+              <Mail className="w-3 h-3" />
+              <span>ghoshsouradip@gmail.com</span>
+            </a>
           </div>
         </div>
 

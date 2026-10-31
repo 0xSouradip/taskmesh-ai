@@ -12,6 +12,7 @@ export const coreTeam = [
     image: souradipImg,
     handle: '0xSouradip',
     github: 'https://github.com/0xSouradip',
+    email: 'ghoshsouradip@gmail.com',
     skills: ['AI Orchestration', 'Full-Stack Architecture', 'React 19 & Vite', 'DAG Dependency Engines', 'Autonomous Agents'],
     badge: 'Founding Lead',
     contributionsCount: 12
@@ -435,6 +436,7 @@ export const sampleFreelancers = [
     handle: '0xSouradip',
     avatar: souradipImg,
     title: 'Lead Engineer & AI Architect',
+    email: 'ghoshsouradip@gmail.com',
     bio: '19-year-old student with a Pure Science background and an intense passion for technology, systems programming, and autonomous AI architectures.',
     xp: 3850,
     level: 13,

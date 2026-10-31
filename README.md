@@ -88,7 +88,7 @@ TaskMesh is designed and built by an ambitious team of student developers passio
 * **Souradip Ghosh** — **Lead Engineer & AI Architect**  
   *19-year-old student with a Pure Science background and a deep passion for technology and distributed systems programming. Architected the TaskMesh DAG dependency engine, autonomous AI verification test harness, and full-stack infrastructure.*  
   * GitHub: [@0xSouradip](https://github.com/0xSouradip)  
-  * Email: ghoshsouradip02@gmail.com
+  * Email: ghoshsouradip@gmail.com
 
 * **Angshu Sarkar** — **Frontend Engineer**  
   *Computer science student and creative frontend developer. Built the modular React 19 component library, Tailwind design token synchronization, responsive state trapping, and gamified quest interactions.*
