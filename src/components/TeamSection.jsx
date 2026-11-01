@@ -174,14 +174,33 @@ export default function TeamSection() {
             <span>•</span>
             <span>Sneha Mukherjee (Frontend)</span>
           </div>
-          <div className="pt-2 border-t border-slate-800/60 flex items-center justify-center gap-2 text-xs font-mono text-slate-400">
-            <span>Reach out to the lead engineer:</span>
+          <div className="pt-3 border-t border-slate-800/60 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-slate-400">
+            <span className="text-slate-300 font-semibold">Direct Team Contact:</span>
             <a
               href="mailto:ghoshsouradip@gmail.com"
               className="text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1 font-semibold"
+              title="Email Souradip Ghosh (Lead Engineer)"
             >
               <Mail className="w-3 h-3" />
-              <span>ghoshsouradip@gmail.com</span>
+              <span>Souradip: ghoshsouradip@gmail.com</span>
+            </a>
+            <span>•</span>
+            <a
+              href="mailto:sarkarangshu04@gmail.com"
+              className="text-emerald-400 hover:text-emerald-300 hover:underline flex items-center gap-1 font-semibold"
+              title="Email Angshu Sarkar (Frontend Engineer)"
+            >
+              <Mail className="w-3 h-3" />
+              <span>Angshu: sarkarangshu04@gmail.com</span>
+            </a>
+            <span>•</span>
+            <a
+              href="mailto:snehamukherjee387@gmail.com"
+              className="text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-1 font-semibold"
+              title="Email Sneha Mukherjee (Frontend Engineer)"
+            >
+              <Mail className="w-3 h-3" />
+              <span>Sneha: snehamukherjee387@gmail.com</span>
             </a>
           </div>
         </div>

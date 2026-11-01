@@ -26,6 +26,7 @@ export const coreTeam = [
     image: angshuImg,
     handle: 'angshu_dev',
     github: 'https://github.com/0xSouradip',
+    email: 'sarkarangshu04@gmail.com',
     skills: ['React & Tailwind CSS', 'Interactive Components', 'UI Performance', 'Responsive Systems', 'State Architecture'],
     badge: 'Core Builder',
     contributionsCount: 9
@@ -39,6 +40,7 @@ export const coreTeam = [
     image: snehaImg,
     handle: 'sneha_tech',
     github: 'https://github.com/0xSouradip',
+    email: 'snehamukherjee387@gmail.com',
     skills: ['Modern Frontend UI', 'Accessibility (WCAG)', 'Animation & Canvas', 'Micro-Task Workflows', 'Design Token Sync'],
     badge: 'Core Builder',
     contributionsCount: 8
@@ -464,6 +466,7 @@ export const sampleFreelancers = [
     handle: 'angshu_dev',
     avatar: angshuImg,
     title: 'Frontend Engineer',
+    email: 'sarkarangshu04@gmail.com',
     bio: 'Computer science student and creative frontend engineer. Passionate about sleek modern user interfaces, reactive state management, Tailwind CSS, and seamless micro-task workflows.',
     xp: 2950,
     level: 10,
@@ -489,6 +492,7 @@ export const sampleFreelancers = [
     handle: 'sneha_tech',
     avatar: snehaImg,
     title: 'Frontend Engineer',
+    email: 'snehamukherjee387@gmail.com',
     bio: 'Engineering student with deep focus on modern web frontend engineering, accessible design systems, interactive HTML5 canvas components, and gamified UI experiences.',
     xp: 2780,
     level: 9,

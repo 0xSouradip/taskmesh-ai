@@ -91,7 +91,9 @@ TaskMesh is designed and built by an ambitious team of student developers passio
   * Email: ghoshsouradip@gmail.com
 
 * **Angshu Sarkar** — **Frontend Engineer**  
-  *Computer science student and creative frontend developer. Built the modular React 19 component library, Tailwind design token synchronization, responsive state trapping, and gamified quest interactions.*
+  *Computer science student and creative frontend developer. Built the modular React 19 component library, Tailwind design token synchronization, responsive state trapping, and gamified quest interactions.*  
+  * Email: sarkarangshu04@gmail.com
 
 * **Sneha Mukherjee** — **Frontend Engineer**  
-  *Tech student focusing on modern frontend architecture, 60fps HTML5 Canvas waveform visualizations, WCAG accessibility standards, and intuitive user workflows.*
+  *Tech student focusing on modern frontend architecture, 60fps HTML5 Canvas waveform visualizations, WCAG accessibility standards, and intuitive user workflows.*  
+  * Email: snehamukherjee387@gmail.com

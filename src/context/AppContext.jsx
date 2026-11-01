@@ -41,8 +41,10 @@ export function AppProvider({ children }) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const hasAngshu = parsed.some(f => f.handle === 'angshu_dev');
-        if (hasAngshu) return parsed;
+        return parsed.map(f => {
+          const match = sampleFreelancers.find(sf => sf.handle === f.handle);
+          return match ? { ...f, email: match.email, avatar: match.avatar } : f;
+        });
       } catch {}
     }
     return sampleFreelancers;

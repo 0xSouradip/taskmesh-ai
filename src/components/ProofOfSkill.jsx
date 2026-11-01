@@ -15,7 +15,8 @@ import {
   Code2,
   FileCheck,
   Star,
-  Users
+  Users,
+  Mail
 } from 'lucide-react';
 
 export default function ProofOfSkill() {
@@ -120,13 +121,23 @@ export default function ProofOfSkill() {
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-xl sm:text-2xl font-bold text-white">
                   {activeSpecialist.name}
                 </h3>
                 <span className="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
                   @{activeSpecialist.handle}
                 </span>
+                {activeSpecialist.email && (
+                  <a
+                    href={`mailto:${activeSpecialist.email}`}
+                    className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-300 hover:text-white bg-slate-950 px-2 py-0.5 rounded border border-slate-800 hover:border-indigo-500/40 transition-colors"
+                    title={`Email ${activeSpecialist.name}`}
+                  >
+                    <Mail className="w-3 h-3 text-indigo-400" />
+                    <span>{activeSpecialist.email}</span>
+                  </a>
+                )}
                 {activeSpecialist.isFoundingTeam && (
                   <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     Founding Team
