@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from './AppProvider';
 import {
   Cpu,
   GitBranch,

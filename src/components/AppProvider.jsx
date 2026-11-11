@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
-import { signIn } from 'next-auth/react';
 import { claimTask as claimTaskAction, submitTask as submitTaskAction, publishProject } from '@/lib/actions';
 
 const AppContext = createContext(null);
@@ -47,8 +46,8 @@ export function AppProvider({ data, children }) {
 
   const requireSignIn = () => {
     if (currentUser) return false;
-    showToast('Sign in required', 'Sign in with GitHub to claim quests, submit work, and publish projects.', 'error');
-    signIn('github');
+    showToast('Sign in required', 'Log in to claim quests, submit work, and publish projects.', 'error');
+    router.push('/login');
     return true;
   };
 

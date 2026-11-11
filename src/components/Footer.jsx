@@ -1,9 +1,13 @@
+'use client';
+
 import React from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from './AppProvider';
 import { Sparkles, Layers, ShieldCheck, Cpu, Code2, Globe, GraduationCap } from 'lucide-react';
 
+const FOOTER_COLORS = ['text-indigo-400', 'text-emerald-400', 'text-purple-400'];
+
 export default function Footer() {
-  const { setActiveTab } = useApp();
+  const { coreTeam, setActiveTab } = useApp();
 
   return (
     <footer className="border-t border-slate-800 bg-[#080b12] text-slate-400 py-12">
@@ -28,9 +32,16 @@ export default function Footer() {
 
             <div className="pt-2 text-xs text-slate-400 font-mono space-y-1">
               <div className="text-white font-semibold">Founding Engineering Team:</div>
-              <div>• <strong className="text-indigo-400">Souradip Ghosh</strong> — Lead Engineer & System Architect (<a href="mailto:ghoshsouradip@gmail.com" className="text-indigo-300 hover:underline">ghoshsouradip@gmail.com</a>)</div>
-              <div>• <strong className="text-emerald-400">Angshu Sarkar</strong> — Frontend Engineer (<a href="mailto:sarkarangshu04@gmail.com" className="text-emerald-300 hover:underline">sarkarangshu04@gmail.com</a>)</div>
-              <div>• <strong className="text-purple-400">Sneha Mukherjee</strong> — Frontend Engineer (<a href="mailto:snehamukherjee387@gmail.com" className="text-purple-300 hover:underline">snehamukherjee387@gmail.com</a>)</div>
+              {coreTeam.map((m, i) => (
+                <div key={m.id}>
+                  • <strong className={FOOTER_COLORS[i % FOOTER_COLORS.length]}>{m.name}</strong> — {m.role}
+                  {m.email && (
+                    <>
+                      {' '}(<a href={`mailto:${m.email}`} className="text-indigo-300 hover:underline">{m.email}</a>)
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -128,8 +139,8 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} TaskMesh. Founded by Souradip Ghosh, Angshu Sarkar & Sneha Mukherjee.</p>
-          <p className="font-mono">React 19 • Tailwind CSS • Vite • Autonomous Swarm</p>
+          <p>© {new Date().getFullYear()} TaskMesh. Founded by {coreTeam.map((m) => m.name).join(', ').replace(/, ([^,]*)$/, ' & $1')}.</p>
+          <p className="font-mono">Next.js • PostgreSQL • Tailwind CSS • Autonomous Swarm</p>
         </div>
 
       </div>

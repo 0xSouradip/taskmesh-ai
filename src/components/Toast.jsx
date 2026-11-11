@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from './AppProvider';
 import { CheckCircle2, AlertCircle, Info, Sparkles, X } from 'lucide-react';
 
 export default function Toast() {

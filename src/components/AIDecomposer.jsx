@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
-import { projectTemplates } from '../data/initialData';
+import { useApp } from './AppProvider';
+import { decomposeProject } from '@/lib/actions';
 import {
   Sparkles,
   Layers,
@@ -18,7 +20,7 @@ import {
 } from 'lucide-react';
 
 export default function AIDecomposer() {
-  const { addProjectWithTasks, setActiveTab } = useApp();
+  const { addProjectWithTasks, projectTemplates, showToast } = useApp();
 
   const [projectTitle, setProjectTitle] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
@@ -41,10 +43,9 @@ export default function AIDecomposer() {
     setGeneratedTasks(null);
   };
 
-  const runDecomposer = () => {
+  const runDecomposer = async () => {
     if (!projectTitle || !projectDescription) {
-      alert('Please provide a project title and description.');
-      return;
+      return showToast('Missing details', 'Please provide a project title and description.', 'error');
     }
 
     setIsDecomposing(true);
@@ -61,74 +62,15 @@ export default function AIDecomposer() {
       });
     }, 700);
 
-    setTimeout(() => {
-      // Find matching template or generate intelligent decomposition
-      const matchingTemplate = projectTemplates.find(
-        (t) => t.title.toLowerCase() === projectTitle.toLowerCase()
-      );
-
-      let tasksResult;
-      if (matchingTemplate) {
-        tasksResult = matchingTemplate.tasks;
-      } else {
-        // Dynamic smart breakdown based on user's custom input
-        tasksResult = [
-          {
-            title: `Design High-Fidelity UI Kit & Design Tokens for ${projectTitle}`,
-            category: 'Design',
-            difficulty: 'Bite-Sized',
-            estimatedHours: '2 hrs',
-            bounty: 190,
-            xp: 450,
-            deliverables: ['Figma token JSON & component auto-layout library'],
-            acceptanceCriteria: ['WCAG AA accessible contrast', 'Standard 8pt spatial grid']
-          },
-          {
-            title: `Draft Value Proposition & Onboarding Microcopy for ${projectTitle}`,
-            category: 'Copywriting',
-            difficulty: 'Bite-Sized',
-            estimatedHours: '1.5 hrs',
-            bounty: 130,
-            xp: 320,
-            deliverables: ['JSON copy file with landing headlines and user reassurance notes'],
-            acceptanceCriteria: ['Grade 7 readability', 'Zero jargon in primary actions']
-          },
-          {
-            title: `Build Responsive Tailwind React Interface Shell for ${projectTitle}`,
-            category: 'Frontend',
-            difficulty: 'Intermediate',
-            estimatedHours: '3 hrs',
-            bounty: 270,
-            xp: 680,
-            deliverables: ['Modular React component tree implementing design tokens'],
-            acceptanceCriteria: ['Passes headless responsive tests at 375px and 1440px']
-          },
-          {
-            title: `Implement Core API Routes & Data Persistence for ${projectTitle}`,
-            category: 'Backend',
-            difficulty: 'Intermediate',
-            estimatedHours: '3.5 hrs',
-            bounty: 310,
-            xp: 750,
-            deliverables: ['Edge-ready REST/tRPC handlers with zod input validation'],
-            acceptanceCriteria: ['Strict input sanitization', 'Sub-100ms response benchmarks']
-          },
-          {
-            title: `Automated Integration & Edge Case Test Suite for ${projectTitle}`,
-            category: 'QA & Security',
-            difficulty: 'Bite-Sized',
-            estimatedHours: '2 hrs',
-            bounty: 180,
-            xp: 450,
-            deliverables: ['Playwright or Vitest automated test suite with coverage report'],
-            acceptanceCriteria: ['100% assertions pass', 'Zero flakiness']
-          }
-        ];
-      }
-
-      setGeneratedTasks(tasksResult);
-      setIsDecomposing(false);
-    }, 3200);
+    // Keep the step animation visible for a moment even when the server answers instantly.
+    const [res] = await Promise.all([
+      decomposeProject({ title: projectTitle, description: projectDescription }),
+      new Promise((resolve) => setTimeout(resolve, 2800)),
+    ]);
+    clearInterval(stepInterval);
+    setIsDecomposing(false);
+    if (!res.ok) return showToast('Decomposition failed', res.error, 'error');
+    setGeneratedTasks(res.tasks);
   };
 
   const handleDeployToSwarm = () => {

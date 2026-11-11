@@ -52,32 +52,46 @@
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [React 19](https://react.dev/) + [Vite](https://vite.dev/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Celebration Effects**: [Canvas Confetti](https://www.npmjs.com/package/canvas-confetti)
-- **State Management**: Reactive React Context with `localStorage` persistence and instant reset support.
+- **Framework**: [Next.js 16](https://nextjs.org/) App Router (one app: server components + server actions, no separate backend)
+- **Database**: PostgreSQL on [Neon](https://neon.tech/) via [Drizzle ORM](https://orm.drizzle.team/) (`drizzle-orm/neon-serverless`)
+- **Auth**: email + password. Passwords are stored as salted scrypt hashes (`node:crypto`), and sessions live in Postgres behind an httpOnly cookie (`src/lib/auth.js`)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) · **Icons**: [Lucide React](https://lucide.dev/)
+
+### Layout
+
+```
+src/app/            routes: / /team /decomposer /swarm /portfolio /leaderboard, api/auth
+src/components/     UI (client components); AppProvider.jsx holds UI-only state + calls server actions
+src/db/             schema.js (tables), index.js (client), seed.js + seed-data.js (demo data)
+src/lib/queries.js  server-only reads (derived budgets, BLOCKED status, relative times)
+src/lib/actions.js  server actions: claimTask, submitTask, decomposeProject, publishProject
+src/lib/ai.js       simulated AI decompose/verify — swap in a real LLM here
+drizzle/            generated SQL migrations
+```
+
+A task's `BLOCKED` state isn't stored. It's derived from its prerequisites, so finishing an upstream task unlocks downstream tasks automatically.
 
 ---
 
 ## 💻 Local Development
 
 ```bash
-# Clone the repository
-git clone https://github.com/0xSouradip/taskmesh-ai.git
-
-# Navigate into project directory
-cd taskmesh-ai
-
-# Install dependencies
 npm install
-
-# Start development server
+cp .env.example .env.local      # fill DATABASE_URL (Neon); optional SEED_PASSWORD
+npm run db:migrate              # apply drizzle/ migrations
+npm run db:seed                 # load demo data (wipes existing rows!)
 npm run dev
-
-# Build for production
-npm run build
 ```
+
+- After a schema change in `src/db/schema.js`, run `npm run db:generate` and then `npm run db:migrate`.
+- `npm run db:reset` drops every table, then migrates and seeds. Dev only.
+- Sign up at `/login`. Seeded users can only log in if `SEED_PASSWORD` was set when you ran `db:seed`; they then use their seeded email with that password.
+
+## ☁️ Deploy (Vercel)
+
+1. Import the repo in Vercel.
+2. Set `DATABASE_URL`.
+3. Run `npm run db:migrate` against the production DB once, plus `db:seed` if you want demo data.
 
 ---
 

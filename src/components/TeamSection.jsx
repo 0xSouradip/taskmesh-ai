@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
-import { coreTeam } from '../data/initialData';
-import { useApp } from '../context/AppContext';
+import { useRouter } from 'next/navigation';
+import { useApp } from './AppProvider';
 import {
   Code2,
   GraduationCap,
@@ -13,8 +15,15 @@ import {
   Mail
 } from 'lucide-react';
 
+const CONTACT_COLORS = [
+  'text-indigo-400 hover:text-indigo-300',
+  'text-emerald-400 hover:text-emerald-300',
+  'text-purple-400 hover:text-purple-300',
+];
+
 export default function TeamSection() {
-  const { setActiveTab } = useApp();
+  const router = useRouter();
+  const { coreTeam, setActiveTab } = useApp();
 
   return (
     <section className="py-16 md:py-24 border-b border-slate-800/60 bg-[#0d1222]/60 relative overflow-hidden">
@@ -143,7 +152,7 @@ export default function TeamSection() {
                   </span>
 
                   <button
-                    onClick={() => setActiveTab('portfolio')}
+                    onClick={() => router.push(`/portfolio?handle=${member.handle}`)}
                     className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-semibold group"
                   >
                     <span>View Proof Ledger</span>
@@ -168,40 +177,28 @@ export default function TeamSection() {
             "We believe students and emerging developers shouldn't be judged by years of resume fluff or asked to do unpaid test projects. With TaskMesh, every 2-hour task you complete is an immutable, verifiable proof of what you can actually build."
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-indigo-300">
-            <span>Souradip Ghosh (Lead)</span>
-            <span>•</span>
-            <span>Angshu Sarkar (Frontend)</span>
-            <span>•</span>
-            <span>Sneha Mukherjee (Frontend)</span>
+            {coreTeam.map((m, i) => (
+              <React.Fragment key={m.id}>
+                {i > 0 && <span>•</span>}
+                <span>{m.name} ({m.role.includes('Lead') ? 'Lead' : m.role.replace(' Engineer', '')})</span>
+              </React.Fragment>
+            ))}
           </div>
           <div className="pt-3 border-t border-slate-800/60 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-slate-400">
             <span className="text-slate-300 font-semibold">Direct Team Contact:</span>
-            <a
-              href="mailto:ghoshsouradip@gmail.com"
-              className="text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1 font-semibold"
-              title="Email Souradip Ghosh (Lead Engineer)"
-            >
-              <Mail className="w-3 h-3" />
-              <span>Souradip: ghoshsouradip@gmail.com</span>
-            </a>
-            <span>•</span>
-            <a
-              href="mailto:sarkarangshu04@gmail.com"
-              className="text-emerald-400 hover:text-emerald-300 hover:underline flex items-center gap-1 font-semibold"
-              title="Email Angshu Sarkar (Frontend Engineer)"
-            >
-              <Mail className="w-3 h-3" />
-              <span>Angshu: sarkarangshu04@gmail.com</span>
-            </a>
-            <span>•</span>
-            <a
-              href="mailto:snehamukherjee387@gmail.com"
-              className="text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-1 font-semibold"
-              title="Email Sneha Mukherjee (Frontend Engineer)"
-            >
-              <Mail className="w-3 h-3" />
-              <span>Sneha: snehamukherjee387@gmail.com</span>
-            </a>
+            {coreTeam.filter((m) => m.email).map((m, i) => (
+              <React.Fragment key={m.id}>
+                {i > 0 && <span>•</span>}
+                <a
+                  href={`mailto:${m.email}`}
+                  className={`${CONTACT_COLORS[i % CONTACT_COLORS.length]} hover:underline flex items-center gap-1 font-semibold`}
+                  title={`Email ${m.name} (${m.role})`}
+                >
+                  <Mail className="w-3 h-3" />
+                  <span>{m.name.split(' ')[0]}: {m.email}</span>
+                </a>
+              </React.Fragment>
+            ))}
           </div>
         </div>
 

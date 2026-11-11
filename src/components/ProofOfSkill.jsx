@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from './AppProvider';
 import {
   ShieldCheck,
   Award,
@@ -19,21 +21,21 @@ import {
   Mail
 } from 'lucide-react';
 
-export default function ProofOfSkill() {
-  const { freelancers, tasks } = useApp();
-  const [selectedHandle, setSelectedHandle] = useState('0xSouradip');
+export default function ProofOfSkill({ initialHandle }) {
+  const { freelancers, tasks, currentUser } = useApp();
+  const [selectedHandle, setSelectedHandle] = useState(initialHandle ?? currentUser?.handle ?? freelancers[0]?.handle);
   const [copied, setCopied] = useState(false);
 
   const activeSpecialist = freelancers.find(f => f.handle === selectedHandle) || freelancers[0];
 
   // Find all tasks completed by this specialist
   const completedTasks = tasks.filter(
-    (t) => t.status === 'COMPLETED' && (t.claimedBy === activeSpecialist.handle || (activeSpecialist.handle === '0xSouradip' && t.claimedBy === '0xSouradip'))
+    (t) => t.status === 'COMPLETED' && t.claimedBy === activeSpecialist.handle
   );
 
   const handleShare = () => {
     navigator.clipboard.writeText(
-      `https://taskmesh.ai/proof/${activeSpecialist.handle}`
+      `${window.location.origin}/portfolio?handle=${encodeURIComponent(activeSpecialist.handle)}`
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);

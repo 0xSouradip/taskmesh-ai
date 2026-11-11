@@ -1,5 +1,10 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { logOut } from '@/lib/actions';
+import { useApp } from './AppProvider';
 import {
   Sparkles,
   Layers,
@@ -10,7 +15,8 @@ import {
   Flame,
   User,
   Briefcase,
-  RotateCcw,
+  LogIn,
+  LogOut,
   Menu,
   X,
   ExternalLink,
@@ -23,12 +29,11 @@ export default function Navbar() {
     setActiveTab,
     userRole,
     setUserRole,
-    currentUser,
-    resetToDefaults
+    currentUser
   } = useApp();
 
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const navItems = [
     { id: 'explore', label: 'Quest Board', icon: Layers },
@@ -126,76 +131,56 @@ export default function Navbar() {
             </div>
 
             {/* User Wallet / XP pill */}
-            <button
-              onClick={() => setActiveTab('portfolio')}
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-indigo-500/40 transition-all group"
-            >
-              <div className="relative">
-                <img
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
-                  className="w-7 h-7 rounded-lg object-cover ring-1 ring-indigo-500/40"
-                  onError={(e) => {
-                    e.target.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80';
-                  }}
-                />
-                <span className="absolute -bottom-1 -right-1 text-[9px] font-bold px-1 rounded bg-indigo-600 text-white leading-none py-0.5">
-                  L{currentUser.level}
-                </span>
-              </div>
-              <div className="text-left hidden md:block">
-                <div className="flex items-center gap-1 text-xs font-bold text-slate-200 group-hover:text-white">
-                  <span>@{currentUser.handle}</span>
-                </div>
-                <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                  <span className="flex items-center text-emerald-400 font-medium">
-                    <Coins className="w-3 h-3 mr-0.5" />
-                    ${currentUser.bountiesEarned}
-                  </span>
-                  <span className="flex items-center text-amber-400 font-medium">
-                    <Flame className="w-3 h-3 mr-0.5" />
-                    {currentUser.xp} XP
-                  </span>
-                </div>
-              </div>
-            </button>
-
-            {/* Reset state helper button */}
-            <div className="relative">
-              <button
-                onClick={() => setShowResetConfirm(!showResetConfirm)}
-                title="Reset demo data to initial state"
-                className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-
-              {showResetConfirm && (
-                <div className="absolute right-0 mt-2 w-64 p-3 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 text-left">
-                  <p className="text-xs font-semibold text-white mb-1">Reset Demo State?</p>
-                  <p className="text-[11px] text-slate-400 mb-3">
-                    Restores all initial tasks, projects, and clears test submissions.
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        resetToDefaults();
-                        setShowResetConfirm(false);
-                      }}
-                      className="px-2.5 py-1 text-xs font-medium rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors"
-                    >
-                      Reset Now
-                    </button>
-                    <button
-                      onClick={() => setShowResetConfirm(false)}
-                      className="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-                    >
-                      Cancel
-                    </button>
+            {currentUser ? (
+              <>
+                <button
+                  onClick={() => setActiveTab('portfolio')}
+                  className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-indigo-500/40 transition-all group"
+                >
+                  <div className="relative">
+                    <img
+                      src={currentUser.avatar}
+                      alt={currentUser.name}
+                      className="w-7 h-7 rounded-lg object-cover ring-1 ring-indigo-500/40"
+                    />
+                    <span className="absolute -bottom-1 -right-1 text-[9px] font-bold px-1 rounded bg-indigo-600 text-white leading-none py-0.5">
+                      L{currentUser.level}
+                    </span>
                   </div>
-                </div>
-              )}
-            </div>
+                  <div className="text-left hidden md:block">
+                    <div className="flex items-center gap-1 text-xs font-bold text-slate-200 group-hover:text-white">
+                      <span>@{currentUser.handle}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                      <span className="flex items-center text-emerald-400 font-medium">
+                        <Coins className="w-3 h-3 mr-0.5" />
+                        ${currentUser.bountiesEarned}
+                      </span>
+                      <span className="flex items-center text-amber-400 font-medium">
+                        <Flame className="w-3 h-3 mr-0.5" />
+                        {currentUser.xp} XP
+                      </span>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={async () => { await logOut(); router.push('/'); }}
+                  title="Sign out"
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Log in</span>
+              </Link>
+            )}
 
             {/* Mobile menu button */}
             <button

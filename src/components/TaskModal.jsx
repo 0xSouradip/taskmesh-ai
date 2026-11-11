@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from './AppProvider';
 import {
   X,
   Coins,
@@ -36,6 +38,7 @@ export default function TaskModal() {
   const currentTaskState = tasks.find(t => t.id === selectedTask.id) || selectedTask;
   const isAvailable = currentTaskState.status === 'AVAILABLE';
   const isInProgress = currentTaskState.status === 'IN_PROGRESS';
+  const isMine = isInProgress && currentTaskState.claimedBy === currentUser?.handle;
   const isCompleted = currentTaskState.status === 'COMPLETED';
   const isBlocked = currentTaskState.status === 'BLOCKED';
 
@@ -44,32 +47,25 @@ export default function TaskModal() {
     return tasks.find(t => t.id === prereqId) || { id: prereqId, title: 'Prerequisite Task', status: 'UNKNOWN' };
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!deliverableLink) {
-      alert('Please provide a deliverable URL (GitHub repo, PR, Figma link, or Gist)');
-      return;
-    }
-
     setIsVerifying(true);
     setVerifyStep('Initiating autonomous AI test harness...');
+    const t1 = setTimeout(() => setVerifyStep('Analyzing compliance against acceptance criteria...'), 900);
+    const t2 = setTimeout(() => setVerifyStep('Extracting metrics and verifying execution integrity...'), 1800);
 
-    setTimeout(() => {
-      setVerifyStep('Analyzing compliance against acceptance criteria...');
-    }, 900);
-
-    setTimeout(() => {
-      setVerifyStep('Extracting metrics and verifying execution integrity...');
-    }, 1800);
-
-    setTimeout(() => {
-      submitTask(currentTaskState.id, {
-        link: deliverableLink,
-        notes: submissionNotes
-      });
-      setIsVerifying(false);
-      setVerifyStep('');
-    }, 2700);
+    const [ok] = await Promise.all([
+      submitTask(currentTaskState.id, { link: deliverableLink, notes: submissionNotes }),
+      new Promise((resolve) => setTimeout(resolve, 2700)),
+    ]);
+    clearTimeout(t1);
+    clearTimeout(t2);
+    setIsVerifying(false);
+    setVerifyStep('');
+    if (ok) {
+      setDeliverableLink('');
+      setSubmissionNotes('');
+    }
   };
 
   return (
@@ -259,7 +255,7 @@ export default function TaskModal() {
           )}
 
           {/* Case 2: IN_PROGRESS - Submit deliverable form */}
-          {isInProgress && (
+          {isMine && (
             <div className="p-5 rounded-xl bg-indigo-950/20 border border-indigo-500/30">
               <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
                 <Send className="w-4 h-4 text-indigo-400" />
@@ -284,7 +280,7 @@ export default function TaskModal() {
                     <input
                       type="url"
                       required
-                      placeholder="https://github.com/0xSouradip/my-task-solution"
+                      placeholder="https://github.com/you/my-task-solution"
                       value={deliverableLink}
                       onChange={(e) => setDeliverableLink(e.target.value)}
                       className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"

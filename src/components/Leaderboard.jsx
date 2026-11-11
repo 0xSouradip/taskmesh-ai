@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from './AppProvider';
 import {
   Trophy,
   Flame,
@@ -135,7 +137,7 @@ export default function Leaderboard() {
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {sortedFreelancers.map((f, idx) => {
-                const isCurrentUser = f.handle === currentUser.handle;
+                const isCurrentUser = f.handle === currentUser?.handle;
                 return (
                   <tr
                     key={f.id}
