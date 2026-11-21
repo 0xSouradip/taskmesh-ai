@@ -60,13 +60,16 @@
 ### Layout
 
 ```
-src/app/            routes: / /team /decomposer /swarm /portfolio /leaderboard, api/auth
-src/components/     UI (client components); AppProvider.jsx holds UI-only state + calls server actions
-src/db/             schema.js (tables), index.js (client), seed.js + seed-data.js (demo data)
-src/lib/queries.js  server-only reads (derived budgets, BLOCKED status, relative times)
-src/lib/actions.js  server actions: claimTask, submitTask, decomposeProject, publishProject
-src/lib/ai.js       simulated AI decompose/verify — swap in a real LLM here
-drizzle/            generated SQL migrations
+src/app/(taskmesh)/   TaskMesh routes: / /team /decomposer /swarm /portfolio /leaderboard /login
+src/app/(kaleid)/     /kaleid, a standalone landing-page demo with its own layout and CSS
+src/components/       UI (client components). AppProvider.jsx holds UI-only state and calls server actions
+src/db/               schema.js (tables), index.js (client), seed.js + seed-data.js (demo data), reset.js
+src/lib/queries.js    server-only reads (derived budgets, BLOCKED status, relative times)
+src/lib/actions.js    server actions: signUp, logIn, logOut, claimTask, submitTask, decomposeProject, publishProject
+src/lib/auth.js       session cookie + sessions table
+src/lib/password.js   scrypt hash / verify
+src/lib/ai.js         simulated AI decompose/verify. Swap in a real LLM here
+drizzle/              generated SQL migrations
 ```
 
 A task's `BLOCKED` state isn't stored. It's derived from its prerequisites, so finishing an upstream task unlocks downstream tasks automatically.
@@ -75,23 +78,39 @@ A task's `BLOCKED` state isn't stored. It's derived from its prerequisites, so f
 
 ## 💻 Local Development
 
+Needs Node 22+ and a [Neon](https://neon.tech/) Postgres database (the app uses Neon's serverless driver).
+
 ```bash
 npm install
-cp .env.example .env.local      # fill DATABASE_URL (Neon); optional SEED_PASSWORD
-npm run db:migrate              # apply drizzle/ migrations
+cp .env.example .env.local      # set DATABASE_URL; optionally SEED_PASSWORD
+npm run db:migrate              # create tables from drizzle/
 npm run db:seed                 # load demo data (wipes existing rows!)
-npm run dev
+npm run dev                     # http://localhost:3000
 ```
 
-- After a schema change in `src/db/schema.js`, run `npm run db:generate` and then `npm run db:migrate`.
-- `npm run db:reset` drops every table, then migrates and seeds. Dev only.
-- Sign up at `/login`. Seeded users can only log in if `SEED_PASSWORD` was set when you ran `db:seed`; they then use their seeded email with that password.
+| Script | What it does |
+| :--- | :--- |
+| `npm run dev` / `build` / `start` | Next.js dev server, production build, production server |
+| `npm test` | Unit tests (`node --test`) |
+| `npm run lint` | oxlint |
+| `npm run db:generate` | Create a migration after editing `src/db/schema.js` |
+| `npm run db:migrate` | Apply pending migrations |
+| `npm run db:seed` | Truncate all tables and load `src/db/seed-data.js` |
+| `npm run db:reset` | **Drops every table**, then migrates and seeds. Dev only |
+
+### Logging in
+
+- Create an account at `/login` (username, email, password of 8+ characters).
+- Seeded users can log in only if `SEED_PASSWORD` was set when you ran `db:seed`. They then use their seeded email with that password.
+- Sessions last 30 days. Only a SHA-256 of the cookie token is stored in the `sessions` table.
 
 ## ☁️ Deploy (Vercel)
 
 1. Import the repo in Vercel.
-2. Set `DATABASE_URL`.
-3. Run `npm run db:migrate` against the production DB once, plus `db:seed` if you want demo data.
+2. Set `DATABASE_URL` (pooled Neon URL). `SEED_PASSWORD` isn't needed at runtime.
+3. Point your local `DATABASE_URL` at the production database and run `npm run db:migrate` once. Run `db:seed` too only if you want demo data, since it wipes existing rows.
+
+Session cookies are marked `secure` automatically when `NODE_ENV=production`.
 
 ---
 

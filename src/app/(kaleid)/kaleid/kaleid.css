@@ -260,7 +260,8 @@ html:has(.kaleid-page) { scroll-behavior: smooth; scroll-padding-top: 90px; back
 @keyframes drift-b { to { transform: translate(-16vw, -8vh) scale(0.9); } }
 main { position: relative; isolation: isolate; }
 
-.reveal { opacity: 0; filter: blur(10px); transform: translateY(28px); }
+/* Hidden only once JS is running (Effects sets .js), so a failed or blocked bundle still shows the page. */
+.js .reveal:not(.in) { opacity: 0; filter: blur(10px); transform: translateY(28px); }
 .reveal.in {
   opacity: 1;
   filter: blur(0);
@@ -338,7 +339,7 @@ main { position: relative; isolation: isolate; }
   animation: pop 650ms var(--spring) both;
   transition: background 200ms ease, color 200ms ease, box-shadow 200ms ease;
 }
-.chip.lit { background: var(--warm); color: #1a1006; box-shadow: 0 0 18px -2px color-mix(in oklab, var(--warm) 70%, transparent); }
+.chip.chip-on { background: var(--warm); color: #1a1006; box-shadow: 0 0 18px -2px color-mix(in oklab, var(--warm) 70%, transparent); }
 
 .sources { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; perspective: 900px; min-width: 0; }
 .card {

@@ -286,12 +286,24 @@ export function startCrystal({ hero, canvas, h1 }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.documentElement.classList.add('has-gl');
 
+  // Once torn down or the GPU drops the context, nothing may touch GL again,
+  // and the h1 must become visible text again.
+  let dead = false;
+  const onLost = () => {
+    dead = true;
+    setRunning(false);
+    canvas.style.visibility = 'hidden'; // a lost context paints blank; show the page behind it
+    document.documentElement.classList.remove('has-gl');
+  };
+  canvas.addEventListener('webglcontextlost', onLost);
+
   // ---- layout-derived state ----
   let W = 1, H = 1, size = 100, rest = { x: 0, y: 0 };
   let dprScale = 1;
   const maxDpr = () => Math.min(window.devicePixelRatio || 1, 1.75);
 
   function layout() {
+    if (dead) return;
     const box = hero.getBoundingClientRect();
     W = box.width;
     H = box.height;
@@ -335,10 +347,19 @@ export function startCrystal({ hero, canvas, h1 }) {
     }
     pointer = p;
   }
-  const onLeave = () => (pointer = null);
+  // Touch: forget the finger when it lifts or the browser takes over to scroll.
+  // Mouse: forget it when it leaves the window (pointerout with no related target).
+  const onEnd = (e) => {
+    if (e.pointerType === 'touch' || e.type === 'pointercancel') pointer = null;
+  };
+  const onOut = (e) => {
+    if (!e.relatedTarget) pointer = null;
+  };
   if (!reduced) {
     addEventListener('pointermove', onMove, { passive: true });
-    document.addEventListener('pointerleave', onLeave);
+    addEventListener('pointerup', onEnd, { passive: true });
+    addEventListener('pointercancel', onEnd, { passive: true });
+    addEventListener('pointerout', onOut, { passive: true });
   }
 
   function step(now) {
@@ -373,6 +394,7 @@ export function startCrystal({ hero, canvas, h1 }) {
   }
 
   function draw(now) {
+    if (dead) return;
     const t = reduced ? 10 : step(now);
     if (reduced) step(now);
     const bob = reduced ? 0 : Math.sin(t * 1.25) * size * 0.025;
@@ -398,17 +420,21 @@ export function startCrystal({ hero, canvas, h1 }) {
   }
 
   // ---- loop, adaptive resolution, visibility ----
-  let running = false, raf = 0, slow = 0, fast = 0, prev = 0;
+  // Frame time is judged against the display's own cadence (`base`), so a 30 Hz
+  // or Low Power Mode display isn't mistaken for a slow GPU.
+  let running = false, raf = 0, slow = 0, fast = 0, prev = 0, base = 1000 / 60;
   function frame(now) {
     if (!running) return;
-    const ft = prev ? now - prev : 16;
+    const ft = prev ? now - prev : base;
     prev = now;
-    if (ft > 20) { fast = 0; if (++slow > 8 && dprScale > 0.45) { dprScale *= 0.85; slow = 0; resizeCanvas(); } }
-    else if (ft < 14) { slow = 0; if (++fast > 180 && dprScale < 1) { dprScale = Math.min(1, dprScale * 1.08); fast = 0; resizeCanvas(); } }
+    base = Math.min(base * 1.002, Math.max(ft, 4)); // tracks the shortest recent interval, drifts up slowly
+    if (ft > base * 1.4) { fast = 0; if (++slow > 8 && dprScale > 0.45) { dprScale *= 0.85; slow = 0; resizeCanvas(); } }
+    else if (ft < base * 1.15) { slow = 0; if (++fast > 180 && dprScale < 1) { dprScale = Math.min(1, dprScale * 1.08); fast = 0; resizeCanvas(); } }
     draw(now);
     raf = requestAnimationFrame(frame);
   }
   function setRunning(on) {
+    if (dead) on = false;
     if (reduced || on === running) return;
     running = on;
     prev = 0;
@@ -429,17 +455,22 @@ export function startCrystal({ hero, canvas, h1 }) {
   });
   ro.observe(hero);
   layout();
-  document.fonts?.ready.then(layout);
+  document.fonts?.ready.then(() => layout());
   const onScrollStill = () => draw(performance.now());
   if (reduced) addEventListener('scroll', onScrollStill, { passive: true });
 
   return () => {
     setRunning(false);
+    dead = true; // also stops a pending fonts.ready / ResizeObserver layout()
+    cancelAnimationFrame(roRaf);
     io.disconnect();
     ro.disconnect();
+    canvas.removeEventListener('webglcontextlost', onLost);
     removeEventListener('pointermove', onMove);
+    removeEventListener('pointerup', onEnd);
+    removeEventListener('pointercancel', onEnd);
+    removeEventListener('pointerout', onOut);
     removeEventListener('scroll', onScrollStill);
-    document.removeEventListener('pointerleave', onLeave);
     document.removeEventListener('visibilitychange', onVis);
     document.documentElement.classList.remove('has-gl');
     // Context is kept: React StrictMode re-runs effects on the same canvas in dev.

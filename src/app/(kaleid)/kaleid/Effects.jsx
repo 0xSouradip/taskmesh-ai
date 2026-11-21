@@ -8,6 +8,7 @@ export default function Effects() {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const cleanups = [];
     const root = document.querySelector('.kaleid-page');
+    root.classList.add('js');
 
     // Film grain: 128px noise tile made once.
     const c = document.createElement('canvas');

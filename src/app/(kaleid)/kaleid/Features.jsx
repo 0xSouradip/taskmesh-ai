@@ -22,25 +22,35 @@ const PEOPLE = [
   { id: 'lin', name: 'Lin', role: 'Contractor' },
 ];
 
+const SENTENCES = [
+  { text: 'The Northwind contract renews on 1 March.', hide: [] },
+  { text: 'Refunds over €500 need a team lead to sign off.', hide: ['lin'] },
+  { text: 'Q3 revenue closed 6% above plan.', hide: ['jo', 'lin'] },
+];
+
 function Permissions() {
+  // Visuals come from CSS :has(); this state only keeps screen readers in step with the blur.
+  const [who, setWho] = useState('amara');
   return (
     <article className="tile glass lit reveal t-perm">
       <h3 className="tile-h">It only knows what you may know.</h3>
       <fieldset className="who">
         <legend className="sr-only">Answer as</legend>
         <span className="who-thumb" aria-hidden="true" />
-        {PEOPLE.map((p, i) => (
+        {PEOPLE.map((p) => (
           <label key={p.id} className="who-opt">
-            <input type="radio" name="who" id={`who-${p.id}`} value={p.id} aria-label={`${p.name}, ${p.role}`} defaultChecked={i === 0} />
+            <input type="radio" name="who" id={`who-${p.id}`} value={p.id} aria-label={`${p.name}, ${p.role}`} checked={who === p.id} onChange={() => setWho(p.id)} />
             <span className="who-name">{p.name}</span>
             <span className="who-role">{p.role}</span>
           </label>
         ))}
       </fieldset>
       <div className="perm-answer">
-        <span data-hide="">The Northwind contract renews on 1 March.</span>{' '}
-        <span data-hide="lin">Refunds over €500 need a team lead to sign off.</span>{' '}
-        <span data-hide="jo lin">Q3 revenue closed 6% above plan.</span>
+        {SENTENCES.map((s) => (
+          <span key={s.text} data-hide={s.hide.join(' ')} aria-hidden={s.hide.includes(who) || undefined}>
+            {s.text}{' '}
+          </span>
+        ))}
       </div>
       <p className="perm-note" data-for="amara">Amara can open all three sources, so she sees all three sentences.</p>
       <p className="perm-note" data-for="jo">The revenue figure lives in a Finance folder Jo cannot open, so Kaleid leaves it out.</p>

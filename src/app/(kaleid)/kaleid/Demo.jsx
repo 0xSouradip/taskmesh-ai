@@ -21,7 +21,7 @@ export default function Demo() {
     const set = (patch) => runId.current === id && setState((s) => ({ ...s, ...patch }));
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     const alive = () => runId.current === id;
-    const final = `Answered in 1.5 s from ${n} sources.`;
+    const final = `Answered in 1.8 s from ${n} sources.`;
 
     setHover(0);
     if (reduced) {
@@ -63,7 +63,12 @@ export default function Demo() {
   useEffect(() => {
     const onAsk = (e) => play(Number(e.detail) || 0);
     window.addEventListener('kaleid:ask', onAsk);
-    return () => window.removeEventListener('kaleid:ask', onAsk);
+    return () => {
+      window.removeEventListener('kaleid:ask', onAsk);
+      // A counter, not a DOM ref: bumping it stops any run in flight (its timers check runId).
+      // oxlint-disable-next-line react-hooks/exhaustive-deps
+      runId.current++;
+    };
   }, []);
 
   // First question plays once, when the panel is 35% visible.
@@ -121,7 +126,7 @@ export default function Demo() {
                   <Fragment key={i}>
                   <button
                     type="button"
-                    className={`chip ${lit === tok.cite ? 'lit' : ''}`}
+                    className={`chip ${lit === tok.cite ? 'chip-on' : ''}`}
                     aria-label={`Source: ${script.sources[tok.cite - 1].title}`}
                     onMouseEnter={() => setHover(tok.cite)}
                     onMouseLeave={() => setHover(0)}
