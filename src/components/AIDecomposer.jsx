@@ -1,10 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Trash2, Minus, Plus, Loader2, CheckCircle2, Circle } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { decomposeProject } from '@/lib/actions';
 import { PageHeader, money } from './ui/bits';
+
+// A signed-out user who clicks Publish goes through Google sign-in, which reloads the page.
+// The brief and the edited plan are parked here and restored when they come back.
+const DRAFT_KEY = 'taskmesh:decomposer-draft';
 
 const STEPS = ['Reading the brief', 'Separating design, copy, frontend, backend and QA', 'Ordering tasks by dependency', 'Writing acceptance criteria and prices'];
 
@@ -18,6 +22,21 @@ export default function AIDecomposer() {
   const [step, setStep] = useState(0);
   const [plan, setPlan] = useState(null);
   const [publishing, setPublishing] = useState(false);
+
+  useEffect(() => {
+    let draft = null;
+    try {
+      draft = JSON.parse(sessionStorage.getItem(DRAFT_KEY));
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch {
+      // storage unavailable or corrupt: start empty
+    }
+    if (!draft) return;
+    setTitle(draft.title ?? '');
+    setDescription(draft.description ?? '');
+    setCategory(draft.category ?? '');
+    if (Array.isArray(draft.plan)) setPlan(draft.plan);
+  }, []);
 
   const applyTemplate = (tpl) => {
     setTitle(tpl.title);
@@ -40,6 +59,13 @@ export default function AIDecomposer() {
   }
 
   async function publish() {
+    if (!currentUser) {
+      try {
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ title, description, category, plan }));
+      } catch {
+        // storage unavailable: the draft is lost, sign-in still works
+      }
+    }
     if (signInFirst()) return;
     setPublishing(true);
     const ok = await addProjectWithTasks({ title, category: category || 'Product development', description }, plan);

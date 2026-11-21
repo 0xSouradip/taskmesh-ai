@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useRef, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
 import { claimTask as claimTaskAction, submitTask as submitTaskAction, publishProject } from '@/lib/actions';
 
@@ -10,7 +10,6 @@ const AppContext = createContext(null);
 // `data` comes from the server (src/lib/queries.js#getAppData) and refreshes via revalidatePath after each action.
 export function AppProvider({ data, children }) {
   const router = useRouter();
-  const pathname = usePathname();
 
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
@@ -29,10 +28,11 @@ export function AppProvider({ data, children }) {
   };
   const dismissToast = () => setToastMessage(null);
 
-  // Signed-out users go to sign-in and come back here afterwards.
+  // Signed-out users go to sign-in and come back here afterwards (query string included,
+  // e.g. /portfolio?handle=alice). Read at click time, so no useSearchParams needed.
   const signInFirst = () => {
     if (currentUser) return false;
-    router.push(`/sign-in?next=${encodeURIComponent(pathname)}`);
+    router.push(`/sign-in?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
     return true;
   };
 

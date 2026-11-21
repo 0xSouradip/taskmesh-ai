@@ -33,8 +33,9 @@ export const getCurrentProfile = cache(async () => {
 
   const email = user.email?.toLowerCase() ?? null;
 
-  // A seeded profile with the same (Google-verified) email is claimed rather than duplicated.
-  if (email && user.emailVerified !== false) {
+  // A seeded profile with the same email is claimed rather than duplicated, but only when
+  // the identity provider says the email is verified (a missing flag does not count).
+  if (email && user.emailVerified === true) {
     const claimed = await db.execute(sql`
       UPDATE users SET auth_user_id = ${user.id}, image = COALESCE(image, ${user.image ?? null})
       WHERE lower(email) = ${email} AND auth_user_id IS NULL
@@ -43,12 +44,16 @@ export const getCurrentProfile = cache(async () => {
   }
 
   // New profile. Retry with a numeric suffix if the handle is taken.
+  // If another profile already owns this email (e.g. linked to an older auth identity),
+  // store NULL instead: otherwise the unique email would make every insert below fail.
   const base = baseHandle(email, user.name);
   for (let i = 0; i < 20; i++) {
     const handle = i === 0 ? base : `${base}${i + 1}`;
     const { rows } = await db.execute(sql`
       INSERT INTO users (id, auth_user_id, name, email, image, handle, title)
-      VALUES (${crypto.randomUUID()}, ${user.id}, ${user.name || handle}, ${email}, ${user.image ?? null}, ${handle}, 'Specialist')
+      VALUES (${crypto.randomUUID()}, ${user.id}, ${user.name || handle},
+        CASE WHEN EXISTS (SELECT 1 FROM users WHERE lower(email) = ${email}) THEN NULL ELSE ${email} END,
+        ${user.image ?? null}, ${handle}, 'Specialist')
       ON CONFLICT DO NOTHING
       RETURNING id, name, handle`);
     if (rows[0]) return rows[0];

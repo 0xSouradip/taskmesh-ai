@@ -7,6 +7,12 @@ import { useEffect, useRef, useState } from 'react';
 export default function CountUp({ value, prefix = '', suffix = '', decimals = 0 }) {
   const ref = useRef(null);
   const [shown, setShown] = useState(value);
+  // A new value (e.g. after data revalidates) shows right away, with or without motion.
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
+    setShown(value);
+  }
 
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;

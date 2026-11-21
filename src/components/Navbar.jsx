@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Menu, X, LogOut, User, BadgeCheck } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { authClient } from '@/lib/auth/client';
@@ -22,7 +22,9 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const menuRef = useRef(null);
-  const signInHref = `/sign-in?next=${encodeURIComponent(pathname)}`;
+  const searchParams = useSearchParams();
+  const query = searchParams.toString();
+  const signInHref = `/sign-in?next=${encodeURIComponent(query ? `${pathname}?${query}` : pathname)}`;
 
   async function signOut() {
     await authClient.signOut();
