@@ -1,5 +1,5 @@
 // Small presentational pieces shared across pages. No state, safe in server or client components.
-import { CheckCircle2, Clock, Lock, Circle } from 'lucide-react';
+import { CheckCircle2, Clock, Lock, Circle, Eye } from 'lucide-react';
 
 export function Avatar({ src, name = '', size = 32, className = '' }) {
   const initial = (name.trim()[0] || '?').toUpperCase();
@@ -22,6 +22,7 @@ export function Avatar({ src, name = '', size = 32, className = '' }) {
 const STATUS = {
   AVAILABLE: { label: 'Open', cls: 'tag-warm', Icon: Circle },
   IN_PROGRESS: { label: 'In progress', cls: 'tag-busy', Icon: Clock },
+  IN_REVIEW: { label: 'In review', cls: 'tag-busy', Icon: Eye },
   COMPLETED: { label: 'Completed', cls: 'tag-ok', Icon: CheckCircle2 },
   BLOCKED: { label: 'Waiting on dependency', cls: '', Icon: Lock },
 };
@@ -40,6 +41,7 @@ export const STATUS_OPTIONS = [
   { id: 'All', label: 'Any status' },
   { id: 'AVAILABLE', label: 'Open' },
   { id: 'IN_PROGRESS', label: 'In progress' },
+  { id: 'IN_REVIEW', label: 'In review' },
   { id: 'COMPLETED', label: 'Completed' },
   { id: 'BLOCKED', label: 'Waiting on dependency' },
 ];

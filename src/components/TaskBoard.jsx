@@ -16,15 +16,17 @@ export default function TaskBoard({ initialQuery = '' }) {
   const [status, setStatus] = useState('All');
   const [projectId, setProjectId] = useState('All');
 
+  // Unclaimed tasks of closed projects are no longer on offer.
+  const listed = tasks.filter((t) => !(t.projectClosed && (t.status === 'AVAILABLE' || t.status === 'BLOCKED')));
   const q = query.trim().toLowerCase();
-  const filtered = tasks.filter(
+  const filtered = listed.filter(
     (t) =>
       (!q || [t.title, t.projectName, t.description, t.category].some((s) => s.toLowerCase().includes(q))) &&
       (category === 'All' || t.category === category) &&
       (status === 'All' || t.status === status) &&
       (projectId === 'All' || t.projectId === projectId)
   );
-  const openValue = tasks.filter((t) => t.status === 'AVAILABLE').reduce((s, t) => s + t.bounty, 0);
+  const openValue = listed.filter((t) => t.status === 'AVAILABLE').reduce((s, t) => s + t.bounty, 0);
   const reset = () => {
     setQuery('');
     setCategory('All');
@@ -39,7 +41,7 @@ export default function TaskBoard({ initialQuery = '' }) {
         title="Find work you are great at."
         actions={<Link href="/decomposer" className="pill pill-primary">Post a project</Link>}
       >
-        Every task has a fixed price, clear deliverables and acceptance criteria. {money(openValue)} is open right now.
+        Every task has an agreed fee, clear deliverables and acceptance criteria. The project owner reviews your work and pays you directly.{openValue > 0 ? ` ${money(openValue)} in open tasks right now.` : ''}
       </PageHeader>
 
       <div className="glass p-4 sm:p-5 mb-8 space-y-4">
@@ -89,10 +91,16 @@ export default function TaskBoard({ initialQuery = '' }) {
       </div>
 
       <p className="text-[14px] text-fg-2 mb-5" aria-live="polite">
-        {filtered.length} of {tasks.length} tasks
+        {filtered.length} of {listed.length} tasks
       </p>
 
-      {filtered.length === 0 ? (
+      {listed.length === 0 ? (
+        <div className="glass p-12 text-center">
+          <p className="text-[18px] font-medium">No tasks yet.</p>
+          <p className="mt-2 text-fg-2">Be the first: post a project and AI will split it into tasks people can pick up.</p>
+          <Link href="/decomposer" className="pill pill-primary pill-sm mt-6">Post a project</Link>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="glass p-12 text-center">
           <p className="text-[18px] font-medium">No tasks match these filters.</p>
           <p className="mt-2 text-fg-2">Try a broader search, or post a project to create new tasks.</p>

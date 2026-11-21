@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Trash2, Minus, Plus, Loader2, CheckCircle2, Circle } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { decomposeProject } from '@/lib/actions';
+import { removeFromPlan } from '@/lib/dag';
 import { PageHeader, money } from './ui/bits';
 
 // A signed-out user who clicks Publish goes through Google sign-in, which reloads the page.
@@ -13,7 +14,7 @@ const DRAFT_KEY = 'taskmesh:decomposer-draft';
 const STEPS = ['Reading the brief', 'Separating design, copy, frontend, backend and QA', 'Ordering tasks by dependency', 'Writing acceptance criteria and prices'];
 
 export default function AIDecomposer() {
-  const { addProjectWithTasks, projectTemplates, showToast, currentUser, signInFirst } = useApp();
+  const { addProjectWithTasks, projectTemplates = [], showToast, currentUser, signInFirst } = useApp();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -45,13 +46,24 @@ export default function AIDecomposer() {
     setPlan(null);
   };
 
+  // Signed-out users are sent through sign-in; park the brief (and plan) so it survives the redirect.
+  const saveDraft = () => {
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ title, description, category, plan }));
+    } catch {
+      // storage unavailable: the draft is lost, sign-in still works
+    }
+  };
+
   async function generate(e) {
     e.preventDefault();
+    if (!currentUser) saveDraft();
+    if (signInFirst()) return;
     setBusy(true);
     setStep(0);
     const timer = setInterval(() => setStep((s) => Math.min(s + 1, STEPS.length - 1)), 650);
     // Keep the steps visible for a moment even when the server answers instantly.
-    const [res] = await Promise.all([decomposeProject({ title, description }), new Promise((r) => setTimeout(r, 2600))]);
+    const [res] = await Promise.all([decomposeProject({ title, description, category }), new Promise((r) => setTimeout(r, 2600))]);
     clearInterval(timer);
     setBusy(false);
     if (!res.ok) return showToast('Could not plan this project', res.error, 'error');
@@ -59,13 +71,7 @@ export default function AIDecomposer() {
   }
 
   async function publish() {
-    if (!currentUser) {
-      try {
-        sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ title, description, category, plan }));
-      } catch {
-        // storage unavailable: the draft is lost, sign-in still works
-      }
-    }
+    if (!currentUser) saveDraft();
     if (signInFirst()) return;
     setPublishing(true);
     const ok = await addProjectWithTasks({ title, category: category || 'Product development', description }, plan);
@@ -79,7 +85,7 @@ export default function AIDecomposer() {
   }
 
   const adjust = (i, delta) => setPlan((p) => p.map((t, j) => (j === i ? { ...t, bounty: Math.max(50, Math.min(5000, t.bounty + delta)) } : t)));
-  const remove = (i) => setPlan((p) => p.filter((_, j) => j !== i));
+  const remove = (i) => setPlan((p) => removeFromPlan(p, i)); // also fixes dependency numbers
   const total = (plan ?? []).reduce((s, t) => s + t.bounty, 0);
 
   return (
@@ -117,7 +123,7 @@ export default function AIDecomposer() {
           <button type="submit" disabled={busy} className="pill pill-primary w-full">
             {busy ? <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> Planning…</> : 'Plan the tasks'}
           </button>
-          {!currentUser && <p className="text-[13px] text-fg-2 text-center">You can plan without an account. Publishing needs a free sign-in.</p>}
+          {!currentUser && <p className="text-[13px] text-fg-2 text-center">Planning uses AI, so it needs a free sign-in. Your brief is kept while you sign in.</p>}
         </form>
 
         <div aria-live="polite">
@@ -163,6 +169,9 @@ export default function AIDecomposer() {
                       </div>
                     </div>
                     <p className="font-medium">{t.title}</p>
+                    <p className="text-[13px] text-fg-2">
+                      {t.dependsOn?.length ? `Starts after ${t.dependsOn.map((d) => `#${String(d + 1).padStart(2, '0')}`).join(', ')}` : 'Can start right away'}
+                    </p>
                     {t.deliverables?.[0] && <p className="text-[14px] text-fg-2">Deliverable: {t.deliverables[0]}</p>}
                     {i > 0 && <p className="text-[13px] text-fg-2">Opens when task {String(i).padStart(2, '0')} is done.</p>}
                   </li>

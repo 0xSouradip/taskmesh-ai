@@ -1,15 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useApp } from './AppProvider';
+import { TEAM } from '@/content/team';
 import { CrystalMark } from './ui/CrystalMark';
 import { NAV } from './Navbar';
 
 const YEAR = new Date().getFullYear();
 
 export default function Footer() {
-  const { coreTeam } = useApp();
-
   return (
     <footer className="border-t border-line mt-24">
       <div className="w-[min(1240px,100%-40px)] mx-auto py-14 grid gap-10 md:grid-cols-[2fr_1fr_1fr]">
@@ -20,11 +18,9 @@ export default function Footer() {
           <p className="text-[14px] text-fg-2">
             Big projects, shipped as small tasks. Specialists do what they are best at, AI checks the work, and every finished task becomes public proof of skill.
           </p>
-          {coreTeam.length > 0 && (
-            <p className="text-[13px] text-fg-2">
-              Built by {coreTeam.map((m) => m.name).join(', ').replace(/, ([^,]*)$/, ' and $1')}.
-            </p>
-          )}
+          <p className="text-[13px] text-fg-2">
+            Built by {TEAM.map((m) => m.name).join(', ').replace(/, ([^,]*)$/, ' and $1')}.
+          </p>
         </div>
 
         <nav aria-label="Product">
@@ -50,7 +46,7 @@ export default function Footer() {
       </div>
       <div className="w-[min(1240px,100%-40px)] mx-auto py-6 border-t border-line text-[13px] text-fg-2 flex flex-wrap justify-between gap-3">
         <span>© {YEAR} TaskMesh</span>
-        <span>Payouts shown are in USD. Demo projects are illustrative.</span>
+        <span>Fees are agreed between project owners and specialists. TaskMesh does not process payments.</span>
       </div>
     </footer>
   );

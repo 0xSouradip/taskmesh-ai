@@ -26,7 +26,7 @@ export default function HomeHero({ examples }) {
         <div className="mt-14 grid gap-10 md:grid-cols-2 items-end animate-[fade-up_1.1s_0.25s_cubic-bezier(0.2,0.7,0.2,1)_both]">
           <div className="space-y-7">
             <p className="text-fg-2 text-[17px] max-w-[46ch]">
-              Post a project and TaskMesh splits it into small, clearly specified tasks. Specialists pick up what they are best at, AI checks every delivery against its acceptance criteria, and payment goes out the moment it passes.
+              Post a project and TaskMesh splits it into small, clearly specified tasks. Specialists pick up what they are best at, AI checks every delivery against its acceptance criteria, and you accept the work and pay the agreed fee directly.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/tasks" className="pill pill-primary magnetic">Browse open tasks</Link>

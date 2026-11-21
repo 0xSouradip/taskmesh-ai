@@ -11,8 +11,8 @@
     "test": "node --test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "node src/db/seed.js",
-    "db:reset": "node src/db/reset.js && drizzle-kit migrate && node src/db/seed.js"
+    "db:reset": "node src/db/reset.js && drizzle-kit migrate",
+    "db:clear-demo": "node src/db/clear-demo.js"
   },
   "dependencies": {
     "@neon/auth": "^0.8.2",

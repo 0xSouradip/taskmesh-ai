@@ -1,5 +1,5 @@
 // Usage: npm run db:reset — DROPS every table in the database (public + drizzle schemas).
-// Run db:migrate and db:seed afterwards. Dev only.
+// `npm run db:reset` also re-applies the migrations, leaving an empty database. Dev only.
 for (const f of ['.env.local', '.env']) { try { process.loadEnvFile(f); } catch {} }
 
 const { Pool } = await import('@neondatabase/serverless');

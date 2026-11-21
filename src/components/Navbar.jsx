@@ -2,10 +2,10 @@
 
 import { useRef } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Menu, X, LogOut, User, BadgeCheck } from 'lucide-react';
 import { useApp } from './AppProvider';
-import { authClient } from '@/lib/auth/client';
+import { signOutAndReload } from '@/lib/auth/client';
 import { CrystalMark } from './ui/CrystalMark';
 import { Avatar } from './ui/bits';
 
@@ -18,18 +18,16 @@ export const NAV = [
 ];
 
 export default function Navbar() {
-  const { currentUser } = useApp();
+  const { currentUser, showToast } = useApp();
   const pathname = usePathname();
-  const router = useRouter();
   const menuRef = useRef(null);
   const searchParams = useSearchParams();
   const query = searchParams.toString();
   const signInHref = `/sign-in?next=${encodeURIComponent(query ? `${pathname}?${query}` : pathname)}`;
 
   async function signOut() {
-    await authClient.signOut();
-    router.push('/');
-    router.refresh();
+    const error = await signOutAndReload();
+    if (error) showToast('Could not sign out', error, 'error');
   }
 
   const isActive = (href) => pathname === href || pathname.startsWith(`${href}/`);

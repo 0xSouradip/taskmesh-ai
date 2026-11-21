@@ -21,7 +21,7 @@ export default async function SignInPage({ searchParams }) {
           <CrystalMark size={28} />
         </span>
         <h1 className="mt-6 text-[30px] font-semibold tracking-[-0.03em]">Sign in to TaskMesh</h1>
-        <p className="mt-2 text-fg-2">Claim tasks, get paid for verified work, and post your own projects.</p>
+        <p className="mt-2 text-fg-2">Claim tasks, build a public record of accepted work, and post your own projects.</p>
 
         {authConfigured() ? (
           <GoogleButton callbackURL={target} />

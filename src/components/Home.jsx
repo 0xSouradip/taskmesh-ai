@@ -7,12 +7,13 @@ import HomeHero from './HomeHero';
 import TaskCard from './TaskCard';
 import { Avatar } from './ui/bits';
 import CountUp from './ui/CountUp';
+import { TEAM } from '@/content/team';
 
 const STEPS = [
   {
     n: '01',
     title: 'Describe the project',
-    body: 'Write what you want built. TaskMesh splits it into small tasks with clear deliverables, acceptance criteria and a price for each.',
+    body: 'Write what you want built. AI drafts small tasks with clear deliverables, acceptance criteria and a suggested fee. You review and publish.',
   },
   {
     n: '02',
@@ -21,8 +22,8 @@ const STEPS = [
   },
   {
     n: '03',
-    title: 'Checked, then paid',
-    body: 'Each delivery is checked against its criteria before payment. The finished work stays on the specialist’s public profile.',
+    title: 'Reviewed, then accepted',
+    body: 'AI checks each delivery against its criteria and flags gaps. The owner accepts it and pays the agreed fee directly. Accepted work stays on the specialist’s profile.',
   },
 ];
 
@@ -30,18 +31,21 @@ const STEPS = [
 const toPhrase = (title) => title.split(/[:,(]/)[0].split(' ').slice(0, 4).join(' ');
 
 export default function Home() {
-  const { tasks, projects, freelancers, coreTeam } = useApp();
-  const open = tasks.filter((t) => t.status === 'AVAILABLE');
+  const { tasks, projects, freelancers, teamHandles = {} } = useApp();
+  const open = tasks.filter((t) => t.status === 'AVAILABLE' && !t.projectClosed);
   const completed = tasks.filter((t) => t.status === 'COMPLETED');
-  const paid = completed.reduce((s, t) => s + t.bounty, 0);
+  const acceptedValue = completed.reduce((s, t) => s + t.bounty, 0);
   const openValue = open.reduce((s, t) => s + t.bounty, 0);
+  const contributors = freelancers.filter((f) => f.delivered > 0).length;
 
+  // Real counts only. The section stays hidden until there is something to count.
   const figures = [
-    { value: completed.length, suffix: '', label: 'tasks delivered and verified' },
-    { value: paid, prefix: '$', label: 'paid out to specialists' },
-    { value: open.length, suffix: '', label: `open tasks worth $${openValue.toLocaleString('en-US')}` },
-    { value: freelancers.length, suffix: '', label: `specialists across ${projects.length} projects` },
+    { value: completed.length, label: 'tasks delivered and accepted' },
+    { value: acceptedValue, prefix: '$', label: 'in fees for accepted work' },
+    { value: open.length, label: `open tasks worth $${openValue.toLocaleString('en-US')}` },
+    { value: contributors, label: `specialists with accepted work, across ${projects.length} projects` },
   ];
+  const hasFigures = figures.some((f) => f.value > 0);
 
   return (
     <>
@@ -90,7 +94,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section aria-label="TaskMesh in numbers" className="py-[clamp(64px,9vw,120px)]">
+      {hasFigures && <section aria-label="TaskMesh in numbers" className="py-[clamp(64px,9vw,120px)]">
         <dl className="w-[min(1240px,100%-40px)] mx-auto grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {figures.map((f) => (
             <div key={f.label} className="border-t border-line pt-6 reveal">
@@ -102,9 +106,9 @@ export default function Home() {
             </div>
           ))}
         </dl>
-      </section>
+      </section>}
 
-      {coreTeam.length > 0 && (
+      {TEAM.length > 0 && (
         <section aria-labelledby="team" className="relative py-[clamp(64px,9vw,120px)]">
           <span className="disc disc-violet -right-[16vw] top-0" aria-hidden="true" />
           <div className="w-[min(1240px,100%-40px)] mx-auto grid gap-10 lg:grid-cols-[1fr_1.4fr] items-center">
@@ -112,21 +116,27 @@ export default function Home() {
               <p className="eyebrow mb-4 reveal">The team</p>
               <h2 id="team" className="h-section reveal">Built by people who ship small.</h2>
               <p className="mt-5 text-fg-2 max-w-[44ch] reveal">
-                TaskMesh is built by a small student team. Their own work on the platform is on the board like everyone else’s.
+                TaskMesh is built by a small student team who think people should be hired for what they can show.
               </p>
               <Link href="/team" className="pill pill-secondary mt-8 reveal">Meet the team</Link>
             </div>
             <ul className="grid gap-4 sm:grid-cols-3">
-              {coreTeam.map((m) => (
-                <li key={m.id} className="glass lit p-6 reveal">
-                  <Avatar src={m.image} name={m.name} size={64} />
-                  <p className="mt-5 font-semibold">{m.name}</p>
-                  <p className="text-[14px] text-fg-2">{m.role}</p>
-                  <Link href={`/portfolio?handle=${encodeURIComponent(m.handle)}`} className="mt-4 inline-block text-[14px] text-warm hover:underline after:absolute after:inset-0">
-                    View work
-                  </Link>
-                </li>
-              ))}
+              {TEAM.map((m) => {
+                const handle = teamHandles[m.email];
+                return (
+                  <li key={m.email} className="glass lit p-6 reveal">
+                    <Avatar src={m.image} name={m.name} size={64} />
+                    <p className="mt-5 font-semibold">{m.name}</p>
+                    <p className="text-[14px] text-fg-2">{m.role}</p>
+                    <Link
+                      href={handle ? `/portfolio?handle=${encodeURIComponent(handle)}` : '/team'}
+                      className="mt-4 inline-block text-[14px] text-warm hover:underline after:absolute after:inset-0"
+                    >
+                      {handle ? 'View work' : 'About'}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </section>
@@ -136,7 +146,7 @@ export default function Home() {
         <span aria-hidden="true" className="absolute left-1/2 -bottom-[40%] w-[140vw] h-[80%] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(255_192_138/0.4),transparent)] blur-[40px] -z-10" />
         <div className="w-[min(1240px,100%-40px)] mx-auto reveal">
           <h2 id="cta" className="text-[clamp(48px,8.4vw,140px)] font-semibold leading-[0.92] tracking-[-0.052em]">Stop hiring for weeks.</h2>
-          <p className="mt-6 text-fg-2 text-[17px] max-w-[44ch] mx-auto">Post your first project in minutes, or earn by finishing a task this afternoon.</p>
+          <p className="mt-6 text-fg-2 text-[17px] max-w-[44ch] mx-auto">Post your first project in minutes, or deliver a task this afternoon.</p>
           <div className="mt-9 flex flex-wrap gap-3.5 justify-center">
             <Link href="/decomposer" className="pill pill-primary magnetic">Post a project</Link>
             <Link href="/tasks" className="pill pill-secondary magnetic">Find a task</Link>

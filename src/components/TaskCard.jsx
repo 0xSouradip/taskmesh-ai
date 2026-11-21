@@ -6,7 +6,7 @@ import { StatusTag, money } from './ui/bits';
 
 export default function TaskCard({ task }) {
   const { setSelectedTask, claimTask } = useApp();
-  const open = task.status === 'AVAILABLE';
+  const open = task.status === 'AVAILABLE' && !task.viewer.isOwner && !task.projectClosed;
 
   return (
     <article className={`glass lit p-6 flex flex-col gap-4 min-w-0 ${task.status === 'BLOCKED' ? 'opacity-70' : ''}`}>
@@ -30,7 +30,7 @@ export default function TaskCard({ task }) {
 
       <div className="mt-auto pt-4 border-t border-line flex items-center justify-between gap-3">
         <div className="flex items-baseline gap-3">
-          <span className="text-[20px] font-semibold tabular-nums">{money(task.bounty)}</span>
+          <span className="text-[20px] font-semibold tabular-nums" title="Agreed fee, paid by the project owner">{money(task.bounty)}</span>
           <span className="text-[13px] text-fg-2">{task.xp} XP</span>
         </div>
         {open && (

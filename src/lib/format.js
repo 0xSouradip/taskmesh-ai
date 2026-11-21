@@ -17,12 +17,19 @@ export function timeAgo(date, now = Date.now()) {
 }
 
 // Presentation for event types; kept out of the DB on purpose.
+// Label for each event type in the activity feed (presentation, kept out of the DB).
 export const EVENT_STYLES = {
-  TASK_CLAIMED: { badge: 'Claimed', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
-  TASK_VERIFIED: { badge: 'Verified', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
-  BOUNTY_PAID: { badge: 'Instant Escrow', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
-  PREREQUISITE_UNLOCKED: { badge: 'Graph Unlocked', color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
-  PROJECT_DECOMPOSED: { badge: 'Decomposition', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
+  PROJECT_DECOMPOSED: { badge: 'New project' },
+  TASK_CLAIMED: { badge: 'Claimed' },
+  TASK_RELEASED: { badge: 'Released' },
+  TASK_SUBMITTED: { badge: 'Submitted' },
+  CHANGES_REQUESTED: { badge: 'Changes requested' },
+  TASK_ACCEPTED: { badge: 'Accepted' },
+  PREREQUISITE_UNLOCKED: { badge: 'Unlocked' },
+  PROJECT_CLOSED: { badge: 'Closed' },
+  // Older event types still in the log.
+  TASK_VERIFIED: { badge: 'Accepted' },
+  TASK_REJECTED: { badge: 'Changes requested' },
 };
 
 export const levelFromXp = (xp) => Math.floor(xp / 300) + 1;

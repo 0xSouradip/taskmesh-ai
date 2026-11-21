@@ -2,16 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { updateProfile } from '@/lib/actions';
-import { authClient } from '@/lib/auth/client';
+import { signOutAndReload } from '@/lib/auth/client';
 import { Avatar, Stat, StatusTag, money } from './ui/bits';
 
 export default function Account() {
   const { currentUser: me, tasks, setSelectedTask, showToast } = useApp();
-  const router = useRouter();
   const [saving, setSaving] = useState(false);
   if (!me) return null;
 
@@ -29,9 +27,8 @@ export default function Account() {
   }
 
   async function signOut() {
-    await authClient.signOut();
-    router.push('/');
-    router.refresh();
+    const error = await signOutAndReload();
+    if (error) showToast('Could not sign out', error, 'error');
   }
 
   return (
