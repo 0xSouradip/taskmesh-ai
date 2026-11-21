@@ -1,208 +1,49 @@
 'use client';
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Mail } from 'lucide-react';
 import { useApp } from './AppProvider';
-import {
-  Code2,
-  GraduationCap,
-  Sparkles,
-  Award,
-  CheckCircle2,
-  Cpu,
-  Layers,
-  ArrowRight,
-  Mail
-} from 'lucide-react';
-
-const CONTACT_COLORS = [
-  'text-indigo-400 hover:text-indigo-300',
-  'text-emerald-400 hover:text-emerald-300',
-  'text-purple-400 hover:text-purple-300',
-];
+import { Avatar, PageHeader } from './ui/bits';
 
 export default function TeamSection() {
-  const router = useRouter();
-  const { coreTeam, setActiveTab } = useApp();
+  const { coreTeam } = useApp();
 
   return (
-    <section className="py-16 md:py-24 border-b border-slate-800/60 bg-[#0d1222]/60 relative overflow-hidden">
-      
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+    <div className="w-[min(1240px,100%-40px)] mx-auto pt-[140px]">
+      <PageHeader eyebrow="Team" title="The people building TaskMesh.">
+        We are a small team of student engineers. We think people should be hired for what they can show, not for how their résumé reads, and we build TaskMesh with the same small tasks it is made for.
+      </PageHeader>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-mono uppercase tracking-wider text-indigo-400 mb-3">
-            <GraduationCap className="w-3.5 h-3.5 text-indigo-300" />
-            <span>Founding Student Engineers</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Meet the Builders Behind TaskMesh
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed">
-            TaskMesh is founded and built by passionate student engineers on a mission to dismantle the broken freelance hiring model through atomic micro-tasks, verifiable proof of skill, and autonomous AI coordination.
-          </p>
-        </div>
-
-        {/* 3 Team Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
-          {coreTeam.map((member) => {
-            const isLead = member.role.includes('Lead');
-            return (
-              <div
-                key={member.id}
-                className={`glow-card rounded-3xl p-6 sm:p-7 border flex flex-col justify-between transition-all ${
-                  isLead
-                    ? 'bg-slate-900/90 border-indigo-500/40 shadow-xl shadow-indigo-500/10 relative'
-                    : 'bg-slate-900/70 border-slate-800/90 hover:border-slate-700'
-                }`}
-              >
-                <div>
-                  
-                  {/* Top Badge */}
-                  <div className="flex items-center justify-between mb-5">
-                    <span
-                      className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
-                        isLead
-                          ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
-                          : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                      }`}
-                    >
-                      {member.badge}
-                    </span>
-
-                    <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
-                      <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
-                      Student Builder
-                    </span>
-                  </div>
-
-                  {/* Photo & Name */}
-                  <div className="flex flex-col items-center text-center mb-5">
-                    <div className="relative mb-4 group">
-                      <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden ring-2 ring-indigo-500/40 p-1 bg-gradient-to-tr from-indigo-500 via-purple-500 to-emerald-400 shadow-2xl">
-                        <img
-                          src={member.image}
-                          alt={member.name}
-                          className="w-full h-full object-cover object-center rounded-[12px] group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      {isLead && (
-                        <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-indigo-600 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-lg">
-                          Lead
-                        </span>
-                      )}
-                    </div>
-
-                    <h3 className="text-xl font-extrabold text-white">
-                      {member.name}
-                    </h3>
-                    <div className="text-xs font-bold text-indigo-400 uppercase tracking-wide mt-0.5">
-                      {member.role}
-                    </div>
-                    <div className="text-xs text-slate-400 font-mono mt-0.5">
-                      @{member.handle} • {member.tagline}
-                    </div>
-
-                    {/* Email Contact Pill */}
-                    {member.email && (
-                      <a
-                        href={`mailto:${member.email}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 hover:text-white border border-indigo-500/30 text-xs font-mono transition-all mt-2.5 shadow-sm shadow-indigo-500/10"
-                        title={`Email ${member.name} directly`}
-                      >
-                        <Mail className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>{member.email}</span>
-                      </a>
-                    )}
-                  </div>
-
-                  {/* Bio */}
-                  <p className="text-xs sm:text-[13px] text-slate-300 leading-relaxed mb-5 text-center sm:text-left">
-                    {member.bio}
-                  </p>
-
-                  {/* Skills Pills */}
-                  <div className="space-y-2 mb-6">
-                    <div className="text-[11px] font-mono uppercase text-slate-400 font-semibold">
-                      Core Specializations:
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {member.skills.map((skill, sIdx) => (
-                        <span
-                          key={sIdx}
-                          className="text-[11px] px-2.5 py-0.5 rounded-md bg-slate-950 text-slate-300 border border-slate-800"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Card Footer CTA */}
-                <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                  <span className="text-xs text-slate-400 font-mono">
-                    <strong className="text-emerald-400">{member.contributionsCount}+</strong> Verified Tasks
-                  </span>
-
-                  <button
-                    onClick={() => router.push(`/portfolio?handle=${member.handle}`)}
-                    className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-semibold group"
-                  >
-                    <span>View Proof Ledger</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-
+      {coreTeam.length === 0 ? (
+        <p className="glass p-10 text-fg-2">Team profiles will appear here.</p>
+      ) : (
+        <ul className="grid gap-5 md:grid-cols-3">
+          {coreTeam.map((m) => (
+            <li key={m.id} className="glass lit p-7 flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <span className="tag tag-warm">{m.badge}</span>
+                <span className="text-[13px] text-fg-2">{m.contributionsCount} tasks delivered</span>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Student Engineering Credo Banner */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-slate-900 to-purple-950/40 border border-indigo-500/30 text-center max-w-4xl mx-auto shadow-2xl space-y-4">
-          <div className="flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <h4 className="text-base font-bold text-white">
-              The Student Engineering Creed
-            </h4>
-          </div>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            "We believe students and emerging developers shouldn't be judged by years of resume fluff or asked to do unpaid test projects. With TaskMesh, every 2-hour task you complete is an immutable, verifiable proof of what you can actually build."
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-indigo-300">
-            {coreTeam.map((m, i) => (
-              <React.Fragment key={m.id}>
-                {i > 0 && <span>•</span>}
-                <span>{m.name} ({m.role.includes('Lead') ? 'Lead' : m.role.replace(' Engineer', '')})</span>
-              </React.Fragment>
-            ))}
-          </div>
-          <div className="pt-3 border-t border-slate-800/60 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-slate-400">
-            <span className="text-slate-300 font-semibold">Direct Team Contact:</span>
-            {coreTeam.filter((m) => m.email).map((m, i) => (
-              <React.Fragment key={m.id}>
-                {i > 0 && <span>•</span>}
-                <a
-                  href={`mailto:${m.email}`}
-                  className={`${CONTACT_COLORS[i % CONTACT_COLORS.length]} hover:underline flex items-center gap-1 font-semibold`}
-                  title={`Email ${m.name} (${m.role})`}
-                >
-                  <Mail className="w-3 h-3" />
-                  <span>{m.name.split(' ')[0]}: {m.email}</span>
-                </a>
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-      </div>
-    </section>
+              <Avatar src={m.image} name={m.name} size={96} className="!rounded-3xl" />
+              <h2 className="mt-6 text-[22px] font-semibold tracking-tight">{m.name}</h2>
+              <p className="text-[14px] text-warm">{m.role}</p>
+              <p className="text-[13px] text-fg-2 mt-0.5">@{m.handle} · {m.tagline}</p>
+              <p className="mt-5 text-[15px] text-fg-2">{m.bio}</p>
+              <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Skills">
+                {m.skills.map((s) => <li key={s} className="tag">{s}</li>)}
+              </ul>
+              <div className="mt-auto pt-6 flex flex-wrap gap-2">
+                <Link href={`/portfolio?handle=${encodeURIComponent(m.handle)}`} className="pill pill-secondary pill-sm">View work</Link>
+                {m.email && (
+                  <a href={`mailto:${m.email}`} className="pill pill-ghost pill-sm" aria-label={`Email ${m.name}`}>
+                    <Mail className="w-4 h-4" aria-hidden="true" /> Email
+                  </a>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

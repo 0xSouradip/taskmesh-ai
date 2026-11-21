@@ -7,16 +7,13 @@ const { db } = await import('./index.js');
 const s = await import('./schema.js');
 const data = await import('./seed-data.js');
 
-const { hashPassword } = await import('../lib/password.js');
-const seedPasswordHash = process.env.SEED_PASSWORD ? await hashPassword(process.env.SEED_PASSWORD) : null;
-
 const teamByHandle = Object.fromEntries(data.coreTeam.map((m, order) => [m.handle, { ...m, order }]));
 const userIdByHandle = Object.fromEntries(data.sampleFreelancers.map((f) => [f.handle, f.id]));
 const projectById = Object.fromEntries(data.initialProjects.map((p) => [p.id, p]));
 
 await db.transaction(async (tx) => {
   await tx.execute(sql`TRUNCATE events, submissions, task_prerequisites, tasks, projects,
-    project_templates, sessions, users RESTART IDENTITY CASCADE`);
+    project_templates, users RESTART IDENTITY CASCADE`);
 
   await tx.insert(s.users).values(
     data.sampleFreelancers.map((f) => {
@@ -25,7 +22,6 @@ await db.transaction(async (tx) => {
         id: f.id,
         name: f.name,
         email: f.email ?? null,
-        passwordHash: f.email ? seedPasswordHash : null,
         image: f.avatar,
         handle: f.handle,
         title: f.title,

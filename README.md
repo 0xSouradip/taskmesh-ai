@@ -52,25 +52,28 @@
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) App Router (one app: server components + server actions, no separate backend)
+- **Framework**: [Next.js 16](https://nextjs.org/) App Router (server components + server actions, no separate backend)
 - **Database**: PostgreSQL on [Neon](https://neon.tech/) via [Drizzle ORM](https://orm.drizzle.team/) (`drizzle-orm/neon-serverless`)
-- **Auth**: email + password. Passwords are stored as salted scrypt hashes (`node:crypto`), and sessions live in Postgres behind an httpOnly cookie (`src/lib/auth.js`)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) · **Icons**: [Lucide React](https://lucide.dev/)
+- **Auth**: [Neon Auth](https://neon.com/docs/auth/overview) (managed Better Auth), **Google sign-in only**, via `@neon/auth`
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) design tokens in `src/app/globals.css` · **Icons**: [Lucide](https://lucide.dev/) · Hero crystal: raw WebGL (`src/components/ui/crystal.js`)
 
 ### Layout
 
 ```
-src/app/(taskmesh)/   TaskMesh routes: / /team /decomposer /swarm /portfolio /leaderboard /login
-src/app/(kaleid)/     /kaleid, a standalone landing-page demo with its own layout and CSS
-src/components/       UI (client components). AppProvider.jsx holds UI-only state and calls server actions
-src/db/               schema.js (tables), index.js (client), seed.js + seed-data.js (demo data), reset.js
-src/lib/queries.js    server-only reads (derived budgets, BLOCKED status, relative times)
-src/lib/actions.js    server actions: signUp, logIn, logOut, claimTask, submitTask, decomposeProject, publishProject
-src/lib/auth.js       session cookie + sessions table
-src/lib/password.js   scrypt hash / verify
-src/lib/ai.js         simulated AI decompose/verify. Swap in a real LLM here
-drizzle/              generated SQL migrations
+src/app/                 routes: / /tasks /decomposer /swarm /leaderboard /team /portfolio /account /sign-in /terms /privacy
+src/app/api/auth/        proxy to Neon Auth (Google OAuth, session, sign-out)
+src/proxy.js             protects /account (Next 16 proxy)
+src/components/          UI. AppProvider.jsx holds UI state and calls server actions
+src/components/ui/       design pieces: crystal.js (WebGL hero), Effects.jsx, bits.jsx
+src/lib/auth/            server.js (Neon Auth), client.js (browser), profile.js (session -> TaskMesh profile)
+src/lib/queries.js       server-only reads (derived budgets, BLOCKED status, relative times)
+src/lib/actions.js       server actions: claimTask, submitTask, decomposeProject, publishProject, updateProfile
+src/lib/ai.js            simulated AI decompose/verify. Swap in a real LLM here
+src/db/                  schema.js, index.js (lazy client), seed.js + seed-data.js, reset.js
+drizzle/                 generated SQL migrations
 ```
+
+Identity lives in Neon Auth's `neon_auth` schema. TaskMesh's own `users` table holds the profile (handle, XP, earnings) and links to Neon Auth through `users.auth_user_id`. The first Google sign-in creates the profile. If a seeded profile has the same email, that profile is claimed instead.
 
 A task's `BLOCKED` state isn't stored. It's derived from its prerequisites, so finishing an upstream task unlocks downstream tasks automatically.
 
@@ -78,15 +81,17 @@ A task's `BLOCKED` state isn't stored. It's derived from its prerequisites, so f
 
 ## 💻 Local Development
 
-Needs Node 22+ and a [Neon](https://neon.tech/) Postgres database (the app uses Neon's serverless driver).
+Needs Node 22+ and a Neon project in an AWS region.
 
 ```bash
 npm install
-cp .env.example .env.local      # set DATABASE_URL; optionally SEED_PASSWORD
+cp .env.example .env.local      # DATABASE_URL, NEON_AUTH_BASE_URL, NEON_AUTH_COOKIE_SECRET
 npm run db:migrate              # create tables from drizzle/
 npm run db:seed                 # load demo data (wipes existing rows!)
 npm run dev                     # http://localhost:3000
 ```
+
+Localhost origins are trusted by Neon Auth by default, and Neon's shared Google credentials work for development.
 
 | Script | What it does |
 | :--- | :--- |
@@ -95,22 +100,26 @@ npm run dev                     # http://localhost:3000
 | `npm run lint` | oxlint |
 | `npm run db:generate` | Create a migration after editing `src/db/schema.js` |
 | `npm run db:migrate` | Apply pending migrations |
-| `npm run db:seed` | Truncate all tables and load `src/db/seed-data.js` |
-| `npm run db:reset` | **Drops every table**, then migrates and seeds. Dev only |
+| `npm run db:seed` | Truncate the app tables and load `src/db/seed-data.js` |
+| `npm run db:reset` | **Drops the app's tables** (`public` and `drizzle` schemas; Neon Auth's `neon_auth` is untouched), then migrates and seeds. Dev only |
 
-### Logging in
+## 🚀 Launch checklist (Vercel + Neon Auth)
 
-- Create an account at `/login` (username, email, password of 8+ characters).
-- Seeded users can log in only if `SEED_PASSWORD` was set when you ran `db:seed`. They then use their seeded email with that password.
-- Sessions last 30 days. Only a SHA-256 of the cookie token is stored in the `sessions` table.
+1. **Enable Neon Auth.** Neon console → your project → **Auth** → enable it on the branch you deploy from. The project must be in an AWS region and must not use IP Allow or Private Networking. Copy the branch's **Auth URL** into `NEON_AUTH_BASE_URL`.
+2. **Google OAuth client.** In Google Cloud Console → APIs & Services → Credentials, create an *OAuth client ID* (Web application).
+   - Authorized redirect URI: `<NEON_AUTH_BASE_URL>/callback/google`.
+   - Then in the Neon console → Auth → OAuth providers → Google, paste the client ID and secret. Neon's shared Google credentials are for development only.
+   - Publish the OAuth consent screen (app name, support email, privacy and terms URLs: `/privacy`, `/terms`).
+3. **Trusted domains.** Neon console → Auth → Domains: add your production URL (e.g. `https://taskmesh.vercel.app`) and any custom domain. Use the scheme and no trailing slash. Add preview URLs if you test sign-in on previews.
+4. **Vercel environment variables** (Production and Preview):
+   - `DATABASE_URL`: the pooled Neon URL.
+   - `NEON_AUTH_BASE_URL`: from step 1.
+   - `NEON_AUTH_COOKIE_SECRET`: `openssl rand -base64 32`.
+   - `NEXT_PUBLIC_SITE_URL`: your production URL.
+5. **Database.** With `DATABASE_URL` pointing at production, run `npm run db:migrate` once. Run `npm run db:seed` only if you want the demo data, because it wipes rows.
+6. **Redeploy**, then sign in with Google on the live site and confirm `/account` loads.
 
-## ☁️ Deploy (Vercel)
-
-1. Import the repo in Vercel.
-2. Set `DATABASE_URL` (pooled Neon URL). `SEED_PASSWORD` isn't needed at runtime.
-3. Point your local `DATABASE_URL` at the production database and run `npm run db:migrate` once. Run `db:seed` too only if you want demo data, since it wipes existing rows.
-
-Session cookies are marked `secure` automatically when `NODE_ENV=production`.
+The build doesn't need any of these variables, so a missing value never breaks a deploy. It shows up at runtime as the error page, or as "sign-in is not available yet".
 
 ---
 

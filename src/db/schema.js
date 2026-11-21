@@ -14,13 +14,14 @@ import {
 const id = () => text('id').primaryKey().$defaultFn(() => crypto.randomUUID());
 const createdAt = () => timestamp('created_at', { withTimezone: true }).notNull().defaultNow();
 
-// ---------- Users + auth ----------
+// ---------- Users (profiles; identity lives in Neon Auth's neon_auth schema) ----------
 
 export const users = pgTable('users', {
   id: id(),
   name: text('name'),
   email: text('email').unique(),
-  passwordHash: text('password_hash'), // scrypt "salt:hash" (hex); null = profile without login (seed data)
+  // Neon Auth user id (neon_auth.user.id). Null for seeded profiles nobody has claimed yet.
+  authUserId: text('auth_user_id').unique(),
   image: text('image'),
   // profile
   handle: text('handle').unique(),
@@ -38,13 +39,6 @@ export const users = pgTable('users', {
   skills: jsonb('skills').notNull().default([]), // [{ name, level }]
   badges: jsonb('badges').notNull().default([]), // [{ id, name, description, icon }]
   createdAt: createdAt(),
-});
-
-// session_token stores sha256(cookie token), so a DB leak doesn't leak live sessions.
-export const sessions = pgTable('sessions', {
-  sessionToken: text('session_token').primaryKey(),
-  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  expires: timestamp('expires', { mode: 'date' }).notNull(),
 });
 
 // ---------- Domain ----------

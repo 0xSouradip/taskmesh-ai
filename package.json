@@ -15,6 +15,7 @@
     "db:reset": "node src/db/reset.js && drizzle-kit migrate && node src/db/seed.js"
   },
   "dependencies": {
+    "@neon/auth": "^0.8.2",
     "@neondatabase/serverless": "^1.2.0",
     "canvas-confetti": "^1.9.4",
     "drizzle-orm": "^0.45.4",

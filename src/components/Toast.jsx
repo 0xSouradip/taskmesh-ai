@@ -1,47 +1,32 @@
 'use client';
 
-import React from 'react';
+import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 import { useApp } from './AppProvider';
-import { CheckCircle2, AlertCircle, Info, Sparkles, X } from 'lucide-react';
+
+const ICONS = { success: CheckCircle2, error: AlertCircle, info: Info };
+const TONES = { success: 'text-ok', error: 'text-danger', info: 'text-warm' };
 
 export default function Toast() {
-  const { toastMessage } = useApp();
-
-  if (!toastMessage) return null;
-
-  const isSuccess = toastMessage.type === 'success';
-  const isError = toastMessage.type === 'error';
+  const { toastMessage, dismissToast } = useApp();
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full animate-in slide-in-from-bottom-5 duration-300">
-      <div
-        className={`p-4 rounded-2xl shadow-2xl border backdrop-blur-md flex items-start gap-3 text-left ${
-          isSuccess
-            ? 'bg-slate-900/95 border-emerald-500/40 shadow-emerald-500/10'
-            : isError
-            ? 'bg-slate-900/95 border-red-500/40 shadow-red-500/10'
-            : 'bg-slate-900/95 border-indigo-500/40 shadow-indigo-500/10'
-        }`}
-      >
-        <div className="flex-shrink-0 mt-0.5">
-          {isSuccess ? (
-            <Sparkles className="w-5 h-5 text-emerald-400" />
-          ) : isError ? (
-            <AlertCircle className="w-5 h-5 text-red-400" />
-          ) : (
-            <Info className="w-5 h-5 text-indigo-400" />
-          )}
+    // Region is always mounted so screen readers announce new messages.
+    <div role="status" aria-live="polite" className="fixed bottom-5 right-5 left-5 sm:left-auto z-[60] sm:w-[380px]">
+      {toastMessage && (
+        <div key={toastMessage.id} className="glass p-4 pr-3 flex items-start gap-3 animate-[toast-in_500ms_var(--ease-spring)]">
+          {(() => {
+            const Icon = ICONS[toastMessage.type] ?? Info;
+            return <Icon className={`w-5 h-5 mt-0.5 shrink-0 ${TONES[toastMessage.type] ?? 'text-warm'}`} aria-hidden="true" />;
+          })()}
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-[15px]">{toastMessage.title}</p>
+            <p className="text-[14px] text-fg-2 mt-0.5">{toastMessage.message}</p>
+          </div>
+          <button type="button" onClick={dismissToast} aria-label="Dismiss" className="grid place-items-center w-8 h-8 rounded-full text-fg-2 hover:text-fg hover:bg-fg/[0.07]">
+            <X className="w-4 h-4" />
+          </button>
         </div>
-
-        <div className="flex-1">
-          <h4 className="text-xs font-bold text-white mb-0.5">
-            {toastMessage.title}
-          </h4>
-          <p className="text-[11px] text-slate-300 leading-relaxed">
-            {toastMessage.message}
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

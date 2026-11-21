@@ -2,8 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { sql } from 'drizzle-orm';
-import { createSession, deleteSession, getSessionUserId } from './auth.js';
-import { hashPassword, verifyPassword } from './password.js';
+import { getCurrentProfile } from './auth/profile.js';
 import { db } from '@/db';
 import { projects, tasks, taskPrerequisites, events, projectTemplates } from '@/db/schema';
 import { INCOMPLETE_PREREQ } from './queries.js';
@@ -11,12 +10,8 @@ import * as ai from './ai.js';
 
 const fail = (error) => ({ ok: false, error });
 
-async function requireUser() {
-  const userId = await getSessionUserId();
-  if (!userId) return null;
-  const { rows } = await db.execute(sql`SELECT id, name, handle FROM users WHERE id = ${userId}`);
-  return rows[0] ?? null;
-}
+// Signed-in user's profile ({ id, name, handle }) or null.
+const requireUser = () => getCurrentProfile();
 
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const int = (v, min, max, fallback) => {
@@ -26,58 +21,11 @@ const int = (v, min, max, fallback) => {
 const strList = (v, maxItems, maxLen) =>
   (Array.isArray(v) ? v : []).map((s) => str(s, maxLen)).filter(Boolean).slice(0, maxItems);
 
-// ---------- Auth (email + password) ----------
-
-// Self-contained avatar (no third-party request): first letter on an indigo tile.
-const initialAvatar = (handle) =>
-  `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#4f46e5"/><text x="50%" y="55%" font-family="sans-serif" font-size="20" fill="#fff" text-anchor="middle" dominant-baseline="middle">${handle[0].toUpperCase()}</text></svg>`
-  )}`;
-
-export async function signUp({ username, email, password } = {}) {
-  const handle = str(username, 39);
-  const cleanEmail = str(email, 254).toLowerCase();
-  if (!/^[a-zA-Z0-9_-]{2,39}$/.test(handle)) return fail('Username: 2-39 letters, numbers, _ or -.');
-  if (!cleanEmail.includes('@')) return fail('Enter a valid email.');
-  if (typeof password !== 'string' || password.length < 8 || password.length > 200)
-    return fail('Password must be at least 8 characters.');
-
-  const passwordHash = await hashPassword(password);
-  const { rows } = await db.execute(sql`
-    INSERT INTO users (id, name, email, handle, title, password_hash, image)
-    VALUES (${crypto.randomUUID()}, ${handle}, ${cleanEmail}, ${handle}, 'Specialist', ${passwordHash},
-      ${initialAvatar(handle)})
-    ON CONFLICT DO NOTHING
-    RETURNING id`);
-  if (!rows[0]) return fail('That email or username is already taken.');
-
-  await createSession(rows[0].id);
-  revalidatePath('/', 'layout');
-  return { ok: true };
-}
-
-export async function logIn({ email, password } = {}) {
-  const cleanEmail = str(email, 254).toLowerCase();
-  const { rows } = await db.execute(sql`SELECT id, password_hash FROM users WHERE email = ${cleanEmail}`);
-  const ok = typeof password === 'string' && (await verifyPassword(password, rows[0]?.password_hash));
-  if (!ok) return fail('Wrong email or password.');
-
-  await createSession(rows[0].id);
-  revalidatePath('/', 'layout');
-  return { ok: true };
-}
-
-export async function logOut() {
-  await deleteSession();
-  revalidatePath('/', 'layout');
-  return { ok: true };
-}
-
-// ---------- Quests ----------
+// ---------- Tasks ----------
 
 export async function claimTask(taskId) {
   const me = await requireUser();
-  if (!me) return fail('Sign in to claim quests.');
+  if (!me) return fail('Sign in to claim tasks.');
 
   // Single conditional UPDATE: closes the race between two claimers and enforces the dependency lock.
   const { rows } = await db.execute(sql`
@@ -85,7 +33,7 @@ export async function claimTask(taskId) {
     WHERE id = ${String(taskId)} AND status = 'AVAILABLE' AND NOT ${INCOMPLETE_PREREQ(sql`tasks.id`)}
     RETURNING title, bounty, xp`);
   const task = rows[0];
-  if (!task) return fail('This quest is locked by dependencies or already claimed.');
+  if (!task) return fail('This task is waiting on a dependency or was already claimed.');
 
   await db.insert(events).values({
     type: 'TASK_CLAIMED',
@@ -147,14 +95,14 @@ export async function submitTask(taskId, { link, notes } = {}) {
       },
       ...unlocked.map((t) => ({
         type: 'PREREQUISITE_UNLOCKED',
-        message: `Dependency Resolved: "${t.title}" is now unlocked and available on the quest board!`,
+        message: `Unlocked: "${t.title}" is now open.`,
       })),
     ]);
 
     return { ok: true, score, feedback, bounty: task.bounty, xp: task.xp, unlockedCount: unlocked.length };
   });
 
-  if (!result) return fail('You can only submit quests you have claimed and not yet completed.');
+  if (!result) return fail('You can only submit tasks you have claimed and not yet completed.');
   revalidatePath('/', 'layout');
   return result;
 }
@@ -225,4 +173,14 @@ export async function publishProject(projectInput = {}, taskInputs = []) {
 
   revalidatePath('/', 'layout');
   return { ok: true, projectId, name, tasksCount: rows.length };
+}
+
+// ---------- Profile ----------
+
+export async function updateProfile({ title, bio } = {}) {
+  const me = await requireUser();
+  if (!me) return fail('Sign in to edit your profile.');
+  await db.execute(sql`UPDATE users SET title = ${str(title, 80) || null}, bio = ${str(bio, 600) || null} WHERE id = ${me.id}`);
+  revalidatePath('/', 'layout');
+  return { ok: true };
 }

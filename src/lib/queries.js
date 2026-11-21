@@ -17,7 +17,8 @@ function toFreelancer(u) {
     handle: u.handle,
     avatar: u.image,
     title: u.title,
-    email: u.email,
+    // Emails are private. Only founding-team contact addresses are public.
+    email: u.is_founding_team ? u.email : null,
     bio: u.bio,
     xp: u.xp,
     level: levelFromXp(u.xp),
@@ -26,8 +27,8 @@ function toFreelancer(u) {
     acceptanceRate: u.acceptance_rate,
     speedRating: u.speed_rating,
     isFoundingTeam: u.is_founding_team,
-    skills: u.skills,
-    badges: u.badges,
+    skills: u.skills ?? [],
+    badges: u.badges ?? [],
   };
 }
 
