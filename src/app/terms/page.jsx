@@ -12,9 +12,15 @@ export default function Terms() {
       <h2>Tasks and deliveries</h2>
       <ul>
         <li>Claim only tasks you intend to deliver. Abandoned claims may be released.</li>
-        <li>Deliver original work you have the right to hand over. Payment transfers ownership of the delivered work to the project owner unless the task says otherwise.</li>
-        <li>Automated review decides acceptance against the task’s criteria. Disputes can be raised with us.</li>
+        <li>Deliver original work you have the right to hand over. Once the owner pays the agreed fee, ownership of the delivered work passes to them unless the task says otherwise.</li>
+        <li>The project owner decides whether a delivery is accepted. An automated AI check gives the owner advice, but it does not decide.</li>
       </ul>
+      <h2>Fees and payment</h2>
+      <p>
+        Each task shows a fee agreed in advance. The project owner pays the specialist directly, outside TaskMesh. TaskMesh does not process,
+        hold or guarantee payments, and is not a party to the agreement between owner and specialist. When you share a task, each side can see
+        the other’s email address to arrange payment.
+      </p>
       <h2>Projects</h2>
       <p>Project owners must describe work honestly and fund the tasks they publish. Illegal, harmful or deceptive projects are removed.</p>
       <h2>Changes</h2>

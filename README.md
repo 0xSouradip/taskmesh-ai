@@ -69,11 +69,22 @@ src/lib/auth/            server.js (Neon Auth), client.js (browser), profile.js 
 src/lib/queries.js       server-only reads (derived budgets, BLOCKED status, relative times)
 src/lib/actions.js       server actions: claimTask, submitTask, decomposeProject, publishProject, updateProfile
 src/lib/ai.js            simulated AI decompose/verify. Swap in a real LLM here
-src/db/                  schema.js, index.js (lazy client), seed.js + seed-data.js, reset.js
+src/db/                  schema.js, index.js (lazy client), reset.js, clear-demo.js
+src/content/team.js      the founding team shown on /team (static content, not DB users)
 drizzle/                 generated SQL migrations
 ```
 
-Identity lives in Neon Auth's `neon_auth` schema. TaskMesh's own `users` table holds the profile (handle, XP, earnings) and links to Neon Auth through `users.auth_user_id`. The first Google sign-in creates the profile. If a seeded profile has the same email, that profile is claimed instead.
+Identity lives in Neon Auth's `neon_auth` schema. TaskMesh's own `users` table holds the profile (handle, headline, bio) and links to Neon Auth through `users.auth_user_id`. The first Google sign-in creates the profile.
+
+There is no demo or seeded data. XP, accepted tasks, fees and rankings are computed from accepted submissions on every request.
+
+### How work flows
+
+1. A signed-in owner describes a project. Gemini drafts tasks with dependencies; the owner edits and publishes.
+2. A specialist claims a task (not in their own project; at most 3 at a time) and submits a link to the work.
+3. Gemini checks the delivery against the acceptance criteria. This is **advice only**.
+4. The owner accepts the work or requests changes with a note. Accepting completes the task, credits XP and unlocks dependent tasks.
+5. **No money moves through TaskMesh.** The fee is agreed up front and the owner pays the specialist directly. On a shared task, each side sees the other's email to arrange it.
 
 A task's `BLOCKED` state isn't stored. It's derived from its prerequisites, so finishing an upstream task unlocks downstream tasks automatically.
 
@@ -87,7 +98,6 @@ Needs Node 22+ and a Neon project in an AWS region.
 npm install
 cp .env.example .env.local      # DATABASE_URL, NEON_AUTH_BASE_URL, NEON_AUTH_COOKIE_SECRET
 npm run db:migrate              # create tables from drizzle/
-npm run db:seed                 # load demo data (wipes existing rows!)
 npm run dev                     # http://localhost:3000
 ```
 
@@ -100,8 +110,8 @@ Localhost origins are trusted by Neon Auth by default, and Neon's shared Google 
 | `npm run lint` | oxlint |
 | `npm run db:generate` | Create a migration after editing `src/db/schema.js` |
 | `npm run db:migrate` | Apply pending migrations |
-| `npm run db:seed` | Truncate the app tables and load `src/db/seed-data.js` |
-| `npm run db:reset` | **Drops the app's tables** (`public` and `drizzle` schemas; Neon Auth's `neon_auth` is untouched), then migrates and seeds. Dev only |
+| `npm run db:clear-demo` | Delete the old demo rows (seeded projects, users, events) and keep real data. Run once after `db:migrate` on a database that was seeded before |
+| `npm run db:reset` | **Drops the app's tables** (`public` and `drizzle` schemas; Neon Auth's `neon_auth` is untouched), then re-applies migrations, leaving an empty database. Dev only |
 
 ## 🚀 Launch checklist (Vercel + Neon Auth)
 
@@ -116,7 +126,7 @@ Localhost origins are trusted by Neon Auth by default, and Neon's shared Google 
    - `NEON_AUTH_BASE_URL`: from step 1.
    - `NEON_AUTH_COOKIE_SECRET`: `openssl rand -base64 32`.
    - `NEXT_PUBLIC_SITE_URL`: your production URL.
-5. **Database.** With `DATABASE_URL` pointing at production, run `npm run db:migrate` once. Run `npm run db:seed` only if you want the demo data, because it wipes rows.
+5. **Database.** With `DATABASE_URL` pointing at production, run `npm run db:migrate` once. If this database ever held the old demo data, run `npm run db:clear-demo` afterwards.
 6. **Redeploy**, then sign in with Google on the live site and confirm `/account` loads.
 
 The build doesn't need any of these variables, so a missing value never breaks a deploy. It shows up at runtime as the error page, or as "sign-in is not available yet".

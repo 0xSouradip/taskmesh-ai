@@ -14,7 +14,7 @@ export default function Privacy() {
         <li>A session cookie that keeps you signed in.</li>
       </ul>
       <h2>What is public</h2>
-      <p>Your name, photo, handle, headline, bio, delivered work and stats are public on your profile and the leaderboard. Your email address is never shown publicly.</p>
+      <p>Your name, photo, handle, headline, bio, delivered work and stats are public on your profile and the leaderboard. Your email address is never shown publicly. It is shown only to the other person on a task you share (the project owner and the specialist), so you can arrange payment.</p>
       <h2>Who processes it</h2>
       <p>Data is stored in a Neon Postgres database. Sign-in is handled by Neon Auth and Google. The site is hosted on Vercel.</p>
       <h2>Your choices</h2>

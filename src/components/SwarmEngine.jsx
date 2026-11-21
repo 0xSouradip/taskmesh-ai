@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useApp } from './AppProvider';
 import { PageHeader, StatusTag, Stat, money } from './ui/bits';
 
@@ -12,17 +13,17 @@ export default function SwarmEngine() {
   const chain = tasks.filter((t) => t.projectId === project?.id);
 
   const done = tasks.filter((t) => t.status === 'COMPLETED');
-  const active = tasks.filter((t) => t.status === 'IN_PROGRESS');
+  const active = tasks.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'IN_REVIEW');
   const waiting = tasks.filter((t) => t.status === 'BLOCKED');
 
   return (
     <div className="w-[min(1240px,100%-40px)] mx-auto pt-[140px]">
       <PageHeader eyebrow="Activity" title="Everything moving, in one place.">
-        Tasks unlock as the work they depend on is finished, deliveries are checked, and payments go out. Here is what is happening across every project.
+        Tasks unlock as the work they depend on is accepted. Here is what is happening across every project.
       </PageHeader>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
-        <Stat label="Delivered" value={done.length} hint={`${money(done.reduce((s, t) => s + t.bounty, 0))} paid out`} />
+        <Stat label="Accepted" value={done.length} hint={done.length ? `${money(done.reduce((s, t) => s + t.bounty, 0))} in agreed fees` : undefined} />
         <Stat label="In progress" value={active.length} />
         <Stat label="Waiting on a dependency" value={waiting.length} />
         <Stat label="Projects" value={projects.length} />
@@ -31,7 +32,7 @@ export default function SwarmEngine() {
       <div className="grid gap-6 lg:grid-cols-[7fr_5fr] items-start">
         <section className="glass p-6 sm:p-8" aria-labelledby="chain-title">
           {projects.length === 0 ? (
-            <p className="text-fg-2">No projects yet.</p>
+            <p className="text-fg-2">No projects yet. <Link href="/decomposer" className="text-warm hover:underline">Post the first one</Link>.</p>
           ) : (
             <>
               <div className="flex flex-wrap gap-2 mb-6" role="group" aria-label="Project">
@@ -84,7 +85,7 @@ export default function SwarmEngine() {
         <section className="glass p-6 sm:p-8" aria-labelledby="feed-title">
           <h2 id="feed-title" className="text-[22px] font-semibold tracking-tight mb-5">Recent activity</h2>
           {aiEvents.length === 0 ? (
-            <p className="text-fg-2">Nothing yet.</p>
+            <p className="text-fg-2">No activity yet. It appears here as people post, claim and deliver tasks.</p>
           ) : (
             <ol className="space-y-4">
               {aiEvents.map((ev) => (

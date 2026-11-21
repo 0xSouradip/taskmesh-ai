@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Link2, ExternalLink, Mail } from 'lucide-react';
+import { Check, Link2, ExternalLink } from 'lucide-react';
 import { useApp } from './AppProvider';
 import { Avatar, Stat, money } from './ui/bits';
 
@@ -40,7 +40,7 @@ export default function ProofOfSkill({ initialHandle }) {
         <div className="flex items-center gap-6 min-w-0">
           <Avatar src={person.avatar} name={person.name} size={96} className="!rounded-3xl" />
           <div className="min-w-0">
-            <p className="eyebrow mb-2">{person.isFoundingTeam ? 'Founding team' : 'Specialist'} · Level {person.level}</p>
+            <p className="eyebrow mb-2">Specialist · Level {person.level}</p>
             <h1 className="text-[clamp(30px,4vw,48px)] font-semibold tracking-[-0.04em] leading-none truncate">{person.name}</h1>
             <p className="mt-2 text-fg-2">@{person.handle}{person.title ? ` · ${person.title}` : ''}</p>
           </div>
@@ -50,8 +50,8 @@ export default function ProofOfSkill({ initialHandle }) {
             {copied ? <Check className="w-4 h-4" aria-hidden="true" /> : <Link2 className="w-4 h-4" aria-hidden="true" />}
             {copied ? 'Link copied' : 'Share profile'}
           </button>
-          {person.email && (
-            <a href={`mailto:${person.email}`} className="pill pill-ghost pill-sm"><Mail className="w-4 h-4" aria-hidden="true" /> Contact</a>
+          {person.github && (
+            <a href={person.github} target="_blank" rel="noreferrer" className="pill pill-ghost pill-sm">GitHub</a>
           )}
           {isMe && <Link href="/account" className="pill pill-ghost pill-sm">Edit in account</Link>}
         </div>
@@ -60,50 +60,28 @@ export default function ProofOfSkill({ initialHandle }) {
       {person.bio && <p className="text-[18px] text-fg/90 max-w-3xl mb-10">{person.bio}</p>}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
-        <Stat label="Tasks delivered" value={person.tasksCompleted} />
-        <Stat label="Earned" value={money(person.bountiesEarned)} />
+        <Stat label="Tasks accepted" value={person.delivered} />
+        <Stat label="Fees for accepted work" value={money(person.feesEarned)} hint="Paid by project owners directly" />
         <Stat label="XP" value={person.xp.toLocaleString('en-US')} />
-        <Stat label="Accepted first time" value={`${person.acceptanceRate}%`} />
+        <Stat label="Accepted without changes" value={person.firstTimeRate === null ? '—' : `${person.firstTimeRate}%`} hint={person.firstTimeRate === null ? 'Shown after 3 accepted tasks' : undefined} />
       </div>
 
-      {(person.skills.length > 0 || person.badges.length > 0) && (
-        <div className="grid gap-6 lg:grid-cols-[7fr_5fr] mb-12">
-          {person.skills.length > 0 && (
-            <section className="glass p-6 sm:p-8">
-              <h2 className="text-[20px] font-semibold tracking-tight mb-6">Skills</h2>
-              <ul className="space-y-4">
-                {person.skills.map((s) => (
-                  <li key={s.name}>
-                    <div className="flex justify-between text-[14px] mb-1.5"><span>{s.name}</span><span className="text-fg-2 tabular-nums">{s.level}</span></div>
-                    <div className="h-1.5 rounded-full bg-fg/10 overflow-hidden" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={s.level} aria-label={s.name}>
-                      <div className="h-full rounded-full bg-fg/80" style={{ width: `${s.level}%` }} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {person.badges.length > 0 && (
-            <section className="glass p-6 sm:p-8">
-              <h2 className="text-[20px] font-semibold tracking-tight mb-6">Recognition</h2>
-              <ul className="space-y-3">
-                {person.badges.map((b) => (
-                  <li key={b.id} className="well p-4">
-                    <p className="font-medium">{b.name}</p>
-                    <p className="text-[14px] text-fg-2 mt-0.5">{b.description}</p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </div>
+      {person.topCategories.length > 0 && (
+        <section className="glass p-6 sm:p-8 mb-12" aria-labelledby="cats">
+          <h2 id="cats" className="text-[20px] font-semibold tracking-tight mb-5">Accepted work by category</h2>
+          <ul className="flex flex-wrap gap-2">
+            {person.topCategories.map((c) => (
+              <li key={c.name} className="tag">{c.name} · {c.count}</li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <section aria-labelledby="delivered-title">
-        <h2 id="delivered-title" className="h-section !text-[clamp(28px,3.6vw,48px)] mb-6">Delivered work</h2>
+        <h2 id="delivered-title" className="h-section !text-[clamp(28px,3.6vw,48px)] mb-6">Accepted work</h2>
         {delivered.length === 0 ? (
           <div className="glass p-10 text-fg-2">
-            No verified deliveries yet.{isMe && <> <Link href="/tasks" className="text-warm hover:underline">Pick up a task</Link> to start building your record.</>}
+            No accepted work yet.{isMe && <> <Link href="/tasks" className="text-warm hover:underline">Pick up a task</Link> to start building your record.</>}
           </div>
         ) : (
           <ul className="grid gap-4 md:grid-cols-2">
@@ -111,7 +89,7 @@ export default function ProofOfSkill({ initialHandle }) {
               <li key={t.id} className="glass lit p-6 space-y-3">
                 <div className="flex items-center justify-between gap-3 text-[13px] text-fg-2">
                   <span className="truncate">{t.projectName}</span>
-                  {t.submission && <span className="tag tag-ok">Score {t.submission.aiReviewScore}/100</span>}
+                  {t.submission && <span className="tag tag-ok">Accepted {t.submission.reviewedAt ?? ''}</span>}
                 </div>
                 <button type="button" onClick={() => setSelectedTask(t)} className="text-left text-[18px] font-semibold tracking-tight hover:text-warm">{t.title}</button>
                 {t.submission && (

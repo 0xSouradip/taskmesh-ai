@@ -18,7 +18,7 @@ export const NAV = [
 ];
 
 export default function Navbar() {
-  const { currentUser, showToast } = useApp();
+  const { currentUser, showToast, reviewQueue } = useApp();
   const pathname = usePathname();
   const menuRef = useRef(null);
   const searchParams = useSearchParams();
@@ -63,7 +63,14 @@ export default function Navbar() {
                 className="flex items-center gap-2 rounded-full pl-1 pr-3 h-10 hover:bg-fg/[0.07] transition-colors"
                 aria-label="Account menu"
               >
-                <Avatar src={currentUser.avatar} name={currentUser.name} size={30} />
+                <span className="relative">
+                  <Avatar src={currentUser.avatar} name={currentUser.name} size={30} />
+                  {reviewQueue.length > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full bg-warm text-[#1a1006] text-[11px] font-bold" aria-label={`${reviewQueue.length} submissions need your review`}>
+                      {reviewQueue.length}
+                    </span>
+                  )}
+                </span>
                 <span className="hidden sm:block text-[14px] max-w-[140px] truncate">{currentUser.name}</span>
               </button>
               <div
@@ -75,7 +82,9 @@ export default function Navbar() {
                   <div className="font-medium truncate">{currentUser.name}</div>
                   <div className="text-[13px] text-fg-2 truncate">@{currentUser.handle}</div>
                 </div>
-                <MenuLink href="/account" icon={User}>Account</MenuLink>
+                <MenuLink href="/account" icon={User}>
+                  Account{reviewQueue.length > 0 ? ` · ${reviewQueue.length} to review` : ''}
+                </MenuLink>
                 <MenuLink href={`/portfolio?handle=${encodeURIComponent(currentUser.handle)}`} icon={BadgeCheck}>
                   Public profile
                 </MenuLink>
