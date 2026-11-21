@@ -16,7 +16,7 @@ export default function Privacy() {
       <h2>What is public</h2>
       <p>Your name, photo, handle, headline, bio, delivered work and stats are public on your profile and the leaderboard. Your email address is never shown publicly. It is shown only to the other person on a task you share (the project owner and the specialist), so you can arrange payment.</p>
       <h2>Who processes it</h2>
-      <p>Data is stored in a Neon Postgres database. Sign-in is handled by Neon Auth and Google. The site is hosted on Vercel.</p>
+      <p>Data is stored in a Neon Postgres database. Sign-in is handled by Neon Auth and Google. The site is hosted on Vercel. Project briefs you ask the AI to plan, and the links and notes you submit for review, are sent to Google’s Gemini API to produce the plan and the advisory review. Google opens the submitted link to read the work, so only submit links you are happy for it to see. We ask Gemini not to store these requests.</p>
       <h2>Your choices</h2>
       <p>You can edit your profile at any time from your account page. To delete your account and data, contact the team from the <a href="/team">team page</a>.</p>
     </Prose>
